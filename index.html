@@ -294,7 +294,7 @@ body.locked .wrap{display:none}
 
 <script>
 (function(){
-  const H='a3723fca82e0ce5d86d485488fdcff86e2b82f2cc1b82d12d50408ef589b9789';
+  const H='7cd15e348292458ed9e1e0e2d4f276f535218f6893584bc38a59c741fb8088b2';
   const body=document.body, lock=document.getElementById('lock');
   function open(){ body.classList.remove('locked'); lock.hidden=true; lock.style.display='none'; try{sessionStorage.setItem('lensUnlock','1');}catch(e){} }
   let ok=false; try{ ok=sessionStorage.getItem('lensUnlock')==='1'; }catch(e){}
@@ -307,7 +307,7 @@ body.locked .wrap{display:none}
   document.getElementById('lockForm').addEventListener('submit',async e=>{
     e.preventDefault();
     const v=document.getElementById('pw').value.normalize('NFKC').replace(/[^0-9]/g,''); const h=await hash(v);
-    if(h===H || (h===null && v==='33'+'44')) open();
+    if(h===H || (h===null && v==='12'+'34')) open();
     else { document.getElementById('pwErr').textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.'; document.getElementById('pw').select(); }
   });
 })();
