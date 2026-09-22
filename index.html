@@ -29,6 +29,8 @@
   --hoya:#86a8ff; --essilor:#4fdcbf; --nikon:#ffd05c; --shadow:0 6px 0 rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
 body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;padding-inline:16px;padding-block:20px 56px}
 .wrap{max-width:1280px;margin:0 auto;display:grid;gap:22px}
 
@@ -294,9 +296,9 @@ body.locked .wrap{display:none}
 (function(){
   const H='a3723fca82e0ce5d86d485488fdcff86e2b82f2cc1b82d12d50408ef589b9789';
   const body=document.body, lock=document.getElementById('lock');
-  function open(){ body.classList.remove('locked'); lock.hidden=true; try{sessionStorage.setItem('lensUnlock','1');}catch(e){} }
+  function open(){ body.classList.remove('locked'); lock.hidden=true; lock.style.display='none'; try{sessionStorage.setItem('lensUnlock','1');}catch(e){} }
   let ok=false; try{ ok=sessionStorage.getItem('lensUnlock')==='1'; }catch(e){}
-  if(ok){ lock.hidden=true; return; }
+  if(ok){ lock.hidden=true; lock.style.display='none'; return; }
   body.classList.add('locked');
   async function hash(t){
     if(window.crypto&&crypto.subtle){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('lens-salt:'+t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
@@ -304,7 +306,7 @@ body.locked .wrap{display:none}
   }
   document.getElementById('lockForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const v=document.getElementById('pw').value.trim(); const h=await hash(v);
+    const v=document.getElementById('pw').value.normalize('NFKC').replace(/[^0-9]/g,''); const h=await hash(v);
     if(h===H || (h===null && v==='33'+'44')) open();
     else { document.getElementById('pwErr').textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.'; document.getElementById('pw').select(); }
   });
