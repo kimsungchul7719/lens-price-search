@@ -182,6 +182,7 @@ body.locked .wrap{display:none}
         <span class="src">에실로 가격표 2026 v1</span>
         <span class="src">에실로 Sales &amp; Technical Guide 2026 v1</span>
         <span class="src">바리락스 가격표 2025 v2</span>
+        <span class="src">니콘·트랜지션스 가격표 2025 v1</span>
         <span class="src">니덱 가격표 Ver.9-1 (2024)</span>
         <span class="src">타사 각인 웹 조사 2026-09 (참고)</span>
       </div>
@@ -286,7 +287,7 @@ body.locked .wrap{display:none}
         <p class="foot">
           · 변색 행의 가격은 해당 굴절률 기본 코팅가(호야: 메이리오 / 에실로: Crizal Rock)에 변색 추가금을 더한 금액입니다. (하이럭스 1.50 변색은 표기된 단가 그대로)<br>
           · 호야 1.55/1.50 칸은 메이리오=1.50, 메이리오 컨트롤=1.55 기준이며, 1.55 주문 시 각인 끝자리 “1L”이 “2L”로 표기됩니다.<br>
-          · 바리락스는 권장소비자가격표 2025 v2(2025년 12월 적용) 기준이며, 변색 행은 기본 코팅가 + 변색 20만원입니다. 니콘은 가격이 없어 사양(각인·도수범위)만 조회됩니다. 각인 아이콘은 글자로 근사 표기했습니다.<br>
+          · 바리락스는 권장소비자가격표 2025 v2(2025년 12월 적용) 기준이며, 변색 행은 기본 코팅가 + 변색 20만원입니다. 니콘·트랜지션스는 권장소비자가격표 2025 v1(2025년 5월 적용) 기준이며, 변색·편광·미러 행은 기본가에 추가금을 더한 금액입니다. 각인 아이콘은 글자로 근사 표기했습니다.<br>
           · <b>참고</b> 배지가 붙은 자이스·로덴스톡·샤미르·세이코·도카이·코닥·케미·대명·한미 항목은 2026년 9월 웹 조사 결과입니다. 세이코·도카이는 2012년 일본 자료, 국산은 업계지·커뮤니티 기반이라 실제 렌즈·제조사 자료로 확인 후 사용하세요. 행을 누르면 출처 링크가 보입니다.<br>
           · 니덱은 권장소비자가격표 Ver.9-1(2024년 2월 시행) 기준입니다. 일반/UV-MAX 가격이 따로 있는 굴절률은 두 줄로 나오며, UV-MAX 마킹은 끝에 u가 붙습니다(NF·SF 누진 마킹 /u·s·h·m·c = 1.74·1.67·1.60·1.55·1.50). 변색 행은 해당 굴절률 기본가 + 변색 추가금입니다.<br>
           · 권장소비자가이며 안경원 정책·검안 수가에 따라 실제 판매가는 다를 수 있습니다.
@@ -650,6 +651,112 @@ const DG_SRC='https://infozib.com/국산-다초점렌즈-가격-정리-차이-�
 W({co:'DAEMYUNG',brand:'대명광학 다가스',prod:'펜탁스 (대명 생산)',focus:P,idx:'',mark:'P (엑시머 레이저)',note:'누진·단초점 공통 이니셜 P',ref:'참고 · 업계지 2019',src:CH_SRC});
 // 한미스위스
 W({co:'HANMI',brand:'한미스위스',prod:'한미 C3 개인맞춤 누진 (갤럭시·이글·스페셜에디션)',focus:P,idx:'',mark:'C3 · OT(귀쪽) · DH=스페셜에디션 드라이브',note:'C3 로고 각인(2010 기사) · OT/DH는 안경사 커뮤니티 답변',ref:'참고 · 커뮤니티(낮음)',src:'https://www.eyeopt.co.kr/xe/pal2/3253932'});
+
+/* ---------------- 니콘 권장소비자가격표 2025 v1 · 트랜지션스 2025 v1 (2025-05 적용) ---------------- */
+(function(){
+const Y={year:'2025',yearNote:'니콘 권장소비자가격표 2025 v1 · 트랜지션스 권장소비자가격표 2025 v1 (2025-05 적용)'};
+const EXP='착색 +3만원(1.74 불가) / 프리즘 +10만원 / 편광 Xperio +12만원(SEEBLUE 불가) / 태국 주문 납기 8~9일 · SEE+UV 선택 시 SEEBLUE 무상 선택(변색·편광 불가)';
+const MIR='미러: 실버·라이트실버·블루·골드·라이트골드 (납기 12~14일)';
+const PBN='블루라이트 필터링 · 변색/편광/미러 불가';
+const V={}, NEW={}, used={};
+const key=(p,i,s)=>p+'|'+i+'|'+s;
+function set(p,i,s,L,nw){ V[key(p,i,s)]=L; if(nw) NEW[key(p,i,s)]=nw; }
+// 누진 Z 시리즈: [SEE+UV, PURE BLUE UV, 미러]
+function Z(p,t,pol){ Object.keys(t).forEach(function(i){ const see=t[i][0], pb=t[i][1], mir=t[i][2]; const L=[['SEE+UV',null,see,'']];
+  if(pb) L.push(['PURE BLUE UV',null,pb,PBN]);
+  if(mir) L.push(['SEE+UV 미러(착색포함)',null,mir,MIR]);
+  L.push(['SEE+UV','트랜지션스 Gen S',see+20,'변색 +20만원 포함 · '+(i==='1.74'?'그레이/브라운':'기본컬러+스타일컬러')]);
+  if(i!=='1.74') L.push(['SEE+UV','트랜지션스 XTRActive',see+20,'변색 +20만원 포함 · 변색편광은 +5만원 추가']);
+  if(pol.indexOf(i)>=0) L.push(['SEE+UV · Xperio 편광',null,see+12,'편광 +12만원 포함 · SEEBLUE 불가'+(i==='1.67'?' · 미러 불가':'')]);
+  set(p,i,'RX',L); }); }
+// 스탠다드·LOHAS·E-Life: [ECC, SEE+UV, PURE BLUE UV, 미러]
+function S(p,t,o){ Object.keys(t).forEach(function(i){ const ecc=t[i][0], see=t[i][1], pb=t[i][2], mir=t[i][3];
+  const b=ecc!=null?ecc:see, bc=ecc!=null?'ECC':'SEE+UV', L=[];
+  if(ecc!=null) L.push(['ECC',null,ecc,'']);
+  if(see!=null) L.push(['SEE+UV',null,see,'']);
+  if(pb) L.push(['PURE BLUE UV',null,pb,PBN]);
+  if(mir) L.push(['SEE+UV 미러(착색포함)',null,mir,MIR]);
+  if(o.g) L.push([bc,'트랜지션스 Gen S',b+20,'변색 +20만원 포함 · 기본컬러+스타일컬러']);
+  if(o.x) L.push([bc,'트랜지션스 XTRActive',b+20,'변색 +20만원 포함 · 변색편광은 +5만원 추가']);
+  if(o.p&&i!=='1.67'&&i!=='1.74') L.push([bc+' · Xperio 편광',null,b+12,'편광 +12만원 포함 · SEEBLUE 불가']);
+  set(p,i,'RX',L); }); }
+Z('씨맥스 얼티밋 Z',{'1.74':[210],'1.67':[170,175,175],'1.60':[150,155,155],'1.50':[130,0,135]},['1.67','1.60','1.50']);
+Z('씨맥스 마스터 Z',{'1.74':[160],'1.67':[130,135,135],'1.60':[110,115,115],'1.50':[90,0,95]},['1.67','1.60','1.50']);
+Z('프레지오 파워 Z',{'1.74':[140],'1.67':[100,105,105],'1.60':[85,90,90],'1.50':[70,0,75]},['1.60','1.50']);
+Z('프레지오 와이드 Z',{'1.74':[90],'1.67':[75,80,80],'1.60':[65,70,70],'1.50':[55,0,60]},['1.60','1.50']);
+Z('프레지오 어드밴스 Z',{'1.74':[75],'1.67':[60,65,65],'1.60':[50,55,55],'1.50':[40,0,45]},['1.60','1.50']);
+S('프레지오 무브 INF',{'1.67':[50,53,58,58],'1.60':[40,43,48,48],'1.50':[30,33,0,38]},{g:1,x:1,p:1});
+S('프레지오 퍼스트',{'1.67':[43,46,51,51],'1.60':[33,36,41,41],'1.50':[25,28,0,33]},{g:1,x:1,p:1});
+S('프레지오 엔트리',{'1.67':[35,38,43,43],'1.60':[25,28,33,33],'1.50':[18,21,0,26]},{g:1,x:1,p:1});
+S('LOHAS 액티브',{'1.67':[null,60,65,65],'1.60':[null,50,55,55],'1.50':[null,40,0,45]},{g:1,x:1,p:1});
+S('LOHAS 워크',{'1.67':[null,60,65],'1.60':[null,50,55],'1.50':[null,40]},{g:1});
+S('LOHAS 홈',{'1.67':[null,60,65],'1.60':[null,50,55],'1.50':[null,40]},{});
+S('LOHAS 리딩',{'1.67':[null,60,65],'1.60':[null,50,55],'1.50':[null,40]},{});
+S('홈 & 오피스 PRO',{'1.74':[60,63],'1.67':[45,48,53],'1.60':[35,38,43],'1.50':[30,33]},{});
+S('솔테스 와이드 PRO',{'1.74':[50,53],'1.67':[35,38,43],'1.60':[30,33,38],'1.50':[25,28]},{});
+S('솔테스 와이드 네오',{'1.67':[32,35,40],'1.60':[22,25,30],'1.50':[17,20]},{});
+set('솔테스 와이드 네오','1.50','여벌',[['ECC',null,12,'여벌 · 납기 3~4일 · 타입1/2 근용도수 +1.00~+3.00']],{mark:'SW/N1',brand:'니콘 누진',focus:'사무용'});
+// 단초점 — 피로완화
+S('릴렉씨 네오 플러스 (0.75~1.75)',{'1.74':[null,75],'1.67':[null,60,65],'1.60':[null,50,55]},{});
+[['1.74',68,0],['1.67',48,53],['1.60',38,43],['1.50',28,0]].forEach(function(a){ const L=[['SEE+UV',null,a[1],'']];
+  if(a[2]) L.push(['PURE BLUE UV',null,a[2],'블루라이트 필터링 · 변색 불가']);
+  if(a[0]!=='1.74') L.push(['SEE+UV','트랜지션스 Gen S',a[1]+17,'변색 +17만원 포함 · 기본컬러']);
+  set('릴렉씨 네오 (0.75~1.75)',a[0],'RX',L); });
+[['1.67',35],['1.60',25],['1.56',18]].forEach(function(a){ set('BLUV PLUS (0.50~1.75)',a[0],'RX',[['SEE+UV',null,a[1],'자외선 차단 + 블루라이트 필터링']]); });
+// 단초점 — 프리미엄
+[['1.74',85,0,0],['1.67',60,65,65],['1.60',50,55,55],['1.50',40,0,45]].forEach(function(a){ const i=a[0], L=[['SEE+UV',null,a[1],'']];
+  if(a[2]) L.push(['PURE BLUE UV',null,a[2],PBN]);
+  if(a[3]) L.push(['SEE+UV 미러(착색포함)',null,a[3],MIR]);
+  if(i!=='1.74') L.push(['SEE+UV','트랜지션스 Gen S',a[1]+17,'변색 +17만원 포함 · 기본컬러+스타일컬러']);
+  if(i==='1.60'||i==='1.50') L.push(['SEE+UV · Xperio 편광',null,a[1]+12,'편광 +12만원 포함 · SEEBLUE 불가']);
+  set('씨맥스 INF',i,'RX',L); });
+[['1.74',75],['1.67',50],['1.60',35]].forEach(function(a){ set('씨맥스 AP',a[0],'RX',[['SEE+UV',null,a[1],'']]); });
+[['1.67',45,50],['1.60',35,40],['1.50',25,30]].forEach(function(a){ const i=a[0], L=[['SEE+UV',null,a[1],''],['SEE+UV 미러(착색포함)',null,a[2],MIR],
+  ['Crizal Rock','트랜지션스 Gen S',a[1]+17,'변색 +17만원 포함 · 기본컬러+스타일컬러'],
+  ['Crizal Rock','트랜지션스 XTRActive',a[1]+20,'변색 +20만원 포함 · 기본컬러+스타일미러'+(i==='1.50'?'(스타일미러 불가)':'')],
+  ['Crizal Rock','XTRActive 편광',a[1]+25,'변색편광 +25만원 포함 · 그레이']];
+  if(i!=='1.67') L.push(['SEE+UV · Xperio 편광',null,a[1]+12,'편광 +12만원 포함 · SEEBLUE 불가']);
+  set('라이트 뷰핏',i,'RX',L); });
+// 단초점 NL — 양면비구면 (마이옵씨)
+[['1.74',55,70,72,'N5'],['1.67',33,45,47,'N4'],['1.60',23,34,0,'N3']].forEach(function(a){ const L=[['SEE+UV',null,a[2],'양면비구면 RX']];
+  if(a[3]) L.push(['SEEBLUE',null,a[3],'양면비구면 RX']);
+  set('양면비구면 DAS',a[0],'RX',L);
+  set('양면비구면 DAS',a[0],'여벌',[['SEECOAT NEXT',null,a[1],'마이옵씨 여벌'+(a[0]!=='1.74'?' · Pure Blue UV 재질 청광 필터링':'')+' · 착색 불가']],{mark:a[4]+' (마이옵씨)',brand:'니콘 단초점',focus:SV}); });
+// 단초점 NL — 비구면
+set('니콘 라이트 비구면','1.67','RX',[['SEE+UV',null,33,'미러 불가']]);
+set('니콘 라이트 비구면','1.60','RX',[['SEE+UV SEEBLUE',null,24,''],['ECC',null,21,''],['SEE+UV 미러(착색포함)',null,26,MIR]]);
+set('니콘 라이트 비구면','1.56','RX',[['SEE+UV SEEBLUE',null,18,''],['ECC',null,15,''],['SEE+UV 미러(착색포함)',null,20,MIR]]);
+set('니콘 라이트 비구면','1.60','여벌',[['ECC',null,13,'']],{mark:'N3',brand:'니콘 단초점',focus:SV});
+set('니콘 라이트 비구면','1.56','여벌',[['ECC',null,8,'']],{mark:'N2',brand:'니콘 단초점',focus:SV});
+[['1.67',25],['1.60',16.5],['1.56',10]].forEach(function(a){ set('비구면 단초점 BLUV',a[0],'여벌',[['BLUV ECC UV',null,a[1],'']]); });
+// 단초점 NL — 구면 (여벌)
+set('니콘 라이트 구면','1.60','여벌',[['SEE+UV SEEBLUE',null,21,''],['ECC',null,18,''],['SEE+UV 미러(착색포함)',null,23,MIR]],{mark:'∩3',brand:'니콘 단초점',focus:SV});
+set('니콘 라이트 구면','1.56','여벌',[['SEE+UV SEEBLUE',null,17,''],['ECC',null,14,''],['SEE+UV 미러(착색포함)',null,19,MIR]],{mark:'∩2',brand:'니콘 단초점',focus:SV});
+// 트랜지션스 단초점
+set('변색 비구면 트랜지션스 GEN S','1.74','RX',[['SEE+UV',null,95,'그레이/브라운']]);
+set('변색 비구면 트랜지션스 GEN S','1.67','RX',[['SEE+UV',null,75,'그레이/브라운']]);
+set('변색 비구면 트랜지션스 GEN S','1.60','여벌',[['ECC',null,35,'그레이/브라운']]);
+set('변색 비구면 트랜지션스 GEN S','1.56','여벌',[['ECC',null,25,'그레이']]);
+set('변색 구면 트랜지션스 GEN S','1.60','RX',[['ECC',null,40,'기본컬러+스타일컬러'],['SEE+UV',null,43,'기본컬러+스타일컬러']]);
+set('변색 구면 트랜지션스 GEN S','1.50','RX',[['ECC',null,30,'기본컬러+스타일컬러'],['SEE+UV',null,33,'기본컬러+스타일컬러']]);
+const SMIR='스타일미러: 블루·포레스트그린(그레이 변색), 바이올렛·골드핑크·실버·브론즈(브라운 변색) · 납기 13~14일';
+set('변색 구면 트랜지션스 XTRActive','1.60','RX',[['Crizal Rock',null,43,''],['Crizal Rock 스타일미러',null,46,SMIR],['Crizal Rock','XTRActive 편광',48,'변색편광 그레이']]);
+set('변색 구면 트랜지션스 XTRActive','1.50','RX',[['Crizal Rock',null,33,''],['Crizal Rock','XTRActive 편광',38,'변색편광 그레이']]);
+set('변색 비구면 트랜지션스 클래식','1.60','여벌',[['ECCUV',null,22,'그레이/브라운']]);
+set('변색 비구면 트랜지션스 클래식','1.56','여벌',[['ECCUV',null,15,'그레이/브라운']]);
+
+function apply(r,L){
+  const bn=(r.note||'').replace(' · 가격표 미포함(사양만)','').replace('가격표 미포함(사양만)','');
+  L.forEach(function(e,n){ const t=n===0?r:Object.assign({},r);
+    t.coat=e[0]; if(e[1]!==null) t.photo=e[1]; t.price=e[2];
+    t.note=bn+(e[3]?(bn?' · ':'')+e[3]:''); t.extra=EXP; Object.assign(t,Y);
+    if(n>0) add(t); });
+}
+R.filter(function(r){return r.co==='NIKON';}).forEach(function(r){ const k=key(r.prod,r.idx,r.sup); if(V[k]&&!used[k]){ used[k]=1; apply(r,V[k]); } });
+Object.keys(V).forEach(function(k){ if(used[k]) return; const nw=NEW[k]; if(!nw) return; const p=k.split('|');
+  add({co:'NIKON',brand:nw.brand,prod:p[0],focus:nw.focus,idx:p[1],sup:p[2],mark:nw.mark,note:''}); apply(R[R.length-1],V[k]); used[k]=1; });
+window.__nikonMissing=Object.keys(V).filter(function(k){return !used[k];});
+})();
 
 /* 출처연도 */
 const YEAR_BY_SRC={[Z_SRC]:'2024',[Z_FO]:'연도미상',[RD_SRC]:'2022','http://www.opticnews.co.kr/news/articleView.html?idxno=23898':'연도미상',[SH_SRC]:'2021',[SK_SRC]:'2012',[CH_SRC]:'2019','http://www.kmedinfo.co.kr/news/articleView.html?idxno=31799':'2015','https://www.clien.net/service/board/lecture/14105735':'2019',[DG_SRC]:'2024','https://www.eyeopt.co.kr/xe/pal2/3253932':'2010·2026'};
