@@ -635,7 +635,7 @@ function render(){
     const main=`<tr data-id="${r.id}" class="${st.open===r.id?'open':''}" tabindex="0">
       <td><div class="co ${r.co}">${CONAME[r.co]||r.co}</div><div class="prod">${esc(r.prod)}</div><div class="brand">${esc(r.brand)}</div></td>
       <td class="num">${fmtPrice(r.price)}</td><td class="yrcell"><span class="ybox${/^20(2[4-9]|3)/.test(r.year)?'':' old'}" title="참고한 자료의 연도"><span class="ylabel">출처</span>${esc(r.year)}</span></td><td class="num">${fmtSale(r.price)}</td>
-      <td>${r.focus}</td><td class="idx">${r.idx||'—'}</td><td>${r.sup}</td>
+      <td>${r.focus}</td><td class="idx">${r.idx||'—'}${r.dasp?'<span class="pill dz">양비</span>':''}</td><td>${r.sup}</td>
       <td>${r.coat?`<span class="pill sv">${esc(r.coat)}</span>`:''}${r.photo?`<span class="pill ph">변색 · ${esc(r.photo)}</span>`:''}${r.ref?`<span class="pill ref">${esc(r.ref)}</span>`:''}</td>
       <td>${mkHtml}</td></tr>`;
     if(st.open!==r.id) return main;
