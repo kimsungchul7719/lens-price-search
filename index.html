@@ -965,5 +965,175 @@ $('go').onclick=()=>{snap();st.open=null;render();document.querySelector('main')
 $('reset').onclick=()=>{['q','mk','pmin','pmax'].forEach(id=>$(id).value='');['brand','photo','coat','mkType'].forEach(id=>$(id).value='');$('priced').checked=true;
   st.co=st.focus=st.idx=st.sup='';st.open=null;seg($('coSeg'),CO,'co');seg($('focusSeg'),FOCUS,'focus');seg($('idxSeg'),IDX,'idx');seg($('supSeg'),SUP,'sup');fillBrand();F=null;render();};
 render();
+/* ---------------- AI 렌즈 상담 챗봇 ---------------- */
+(function(){
+const CO_ALIAS=[['HOYA',/호야|hoya/i],['ESSILOR',/에실로|essilor|바리락스|varilux|아이젠|eyezen|스텔리스트|stellest/i],['NIKON',/니콘|nikon/i],['ZEISS',/자이스|zeiss/i],['RODENSTOCK',/로덴스톡|rodenstock/i],['SHAMIR',/샤미르|shamir/i],['SEIKO',/세이코|seiko/i],['TOKAI',/도카이|토카이|tokai/i],['KODAK',/코닥|kodak/i],['CHEMI',/케미|chemi/i],['DAEMYUNG',/대명|다가스|dagas/i],['HANMI',/한미/i],['NIDEK',/니덱|nidek/i],['EXCELITE',/엑셀라이트|excelite/i]];
+const STOP=/^(가격|얼마|얼마야|알려줘|알려|주세요|추천|추천해줘|렌즈|제품|중에|중|있어|있나요|뭐야|뭐|어떤|찾아줘|검색|보여줘|비교|비교해줘|소비자가|할인가|마크|각인|굴절률|누진|다초점|단초점|변색|여벌|rx|이하|이상|미만|초과|만원|원|가장|제일|싼|저렴한|비싼|좋은|싸게|것|거|은|는|이|가|을|를|의|와|과|로|으로|에서|에|좀|요|종류|종류는|종류가|라인업|목록|리스트|있어요|있나요|뭐가|어떤게|어떤것|무엇|뭐있어|알려주세요)$/i;
+const TERM=/변색|렌즈|누진|다초점|단초점|굴절률|가격|코팅|제품|브랜드/;
+const LISTQ=/종류|라인업|목록|리스트|뭐가\s*있|어떤\s*(게|것|제품|렌즈|코팅|변색)|무엇이\s*있|몇\s*가지/;
+function groupBy(rows,field){ const m=new Map(); rows.forEach(r=>{ const k=field==='photo'?r.photo:field==='coat'?r.coat:field==='brand'?r.brand:r.prod; if(!k) return; if(!m.has(k)) m.set(k,{name:k,count:0,prods:new Set(),min:null,max:null,years:new Set()}); const g=m.get(k); g.count++; g.prods.add(r.prod); g.years.add(r.year); if(r.price!=null){ g.min=g.min==null?r.price:Math.min(g.min,r.price); g.max=g.max==null?r.price:Math.max(g.max,r.price);} }); return [...m.values()].map(g=>({이름:g.name,행수:g.count,적용제품수:g.prods.size,적용제품예:[...g.prods].slice(0,4).join(', '),소비자가_최저_만원:g.min,소비자가_최고_만원:g.max,출처연도:[...g.years].join('·')})); }
+function toNum(v){ const n=parseFloat(v); return isNaN(n)?null:n; }
+function search(p){
+  let rows=R.slice();
+  const cos=[].concat(p.company||[]).filter(Boolean);
+  if(cos.length) rows=rows.filter(r=>cos.includes(r.co));
+  if(p.index){ const dz=String(p.index).includes('양비'); const b=String(p.index).replace('양비',''); rows=rows.filter(r=>r.idx===b&&(!dz||r.dasp)); }
+  if(p.focus){ const f=p.focus; rows=rows.filter(r=>f==='다초점'?(r.focus==='누진다초점'||r.focus==='사무용'):r.focus===f); }
+  if(p.supply) rows=rows.filter(r=>r.sup===p.supply);
+  if(p.photochromic===true) rows=rows.filter(r=>r.photo); else if(p.photochromic===false) rows=rows.filter(r=>!r.photo);
+  if(p.mark){ const m=normMark(p.mark); rows=rows.filter(r=>r.mk.includes(m)); }
+  const mn=toNum(p.minPrice), mx=toNum(p.maxPrice);
+  if(mn!=null) rows=rows.filter(r=>r.price!=null&&r.price>=mn);
+  if(mx!=null) rows=rows.filter(r=>r.price!=null&&r.price<=mx);
+  if(p.pricedOnly) rows=rows.filter(r=>r.price!=null);
+  const kw=String(p.keywords||'').toLowerCase().split(/\s+/).filter(Boolean);
+  if(kw.length){ const strict=rows.filter(r=>kw.every(t=>r.hay.includes(t)));
+    rows=strict.length?strict:rows.filter(r=>kw.some(t=>r.hay.includes(t))); }
+  const s=p.sort||'price-asc';
+  rows.sort((a,b)=>s==='price-desc'?((b.price??-1)-(a.price??-1)):((a.price??1e9)-(b.price??1e9)));
+  return rows;
+}
+function compact(r){ return {회사:CONAME[r.co]||r.co,제품:r.prod,초점:r.focus,굴절률:r.idx+(r.dasp?'(양비)':''),공급:r.sup,코팅:r.coat||'',변색:r.photo||'',마크:r.mark||'',소비자가_만원:r.price,할인가50_만원:r.price!=null?Math.round(r.price*5)/10:null,출처연도:r.year,메모:(r.note||'').slice(0,160),추가비용:(r.extra||'').slice(0,160),참고2025:(r.ref2025||'').slice(0,160)}; }
+function parse(q){
+  const p={company:[],pricedOnly:true};
+  CO_ALIAS.forEach(([c,re])=>{ if(re.test(q)) p.company.push(c); });
+  const ix=q.match(/1\.(50|53|55|56|59|60|67|70|74|76)(\s*양비)?/); if(ix) p.index='1.'+ix[1]+(ix[2]?'양비':'');
+  if(/단초점/.test(q)) p.focus='단초점'; else if(/사무|오피스|중근/.test(q)) p.focus='사무용'; else if(/근시\s*억제|근시\s*케어|어린이|아이\s|키즈/.test(q)) p.focus='근시억제'; else if(/누진|다초점|돋보기 겸용/.test(q)) p.focus='다초점';
+  if(/여벌|스톡|stock/i.test(q)) p.supply='여벌';
+  if(/변색|센서티|트랜지션|transition|xtractive/i.test(q)) p.photochromic=true; else if(/클리어|변색\s*없/.test(q)) p.photochromic=false;
+  const pr=q.match(/(\d+(?:\.\d+)?)\s*만\s*원?\s*(이하|미만|아래|밑|까지)/); if(pr) p.maxPrice=pr[1];
+  const pr2=q.match(/(\d+(?:\.\d+)?)\s*만\s*원?\s*(이상|초과|넘)/); if(pr2) p.minPrice=pr2[1];
+  if(/비싼|고급|프리미엄|최고/.test(q)) p.sort='price-desc';
+  const mk=q.match(/(?:마크|각인)\s*[:：]?\s*([A-Za-z0-9*◆◈\/ ]{2,20})/)||q.match(/\b([A-Za-z]{1,4}\*?[0-9][A-Za-z0-9]{0,4})\b/);
+  if(mk&&!/^1\.\d/.test(mk[1])){ p.mark=mk[1].trim(); p.pricedOnly=false; }
+  const words=q.replace(/1\.\d+/g,' ').replace(/[?.,!~"'()]/g,' ').split(/\s+/).filter(w=>w&&w.length>1&&!STOP.test(w)&&!CO_ALIAS.some(([,re])=>re.test(w))&&!(p.mark&&w.includes(p.mark))&&!/만원|이하|이상|미만|양비/.test(w)&&!TERM.test(w));
+  p.keywords=words.join(' ');
+  return p;
+}
+function won(p){ return p==null?'가격 미기재':(p%1?Math.floor(p)+'만'+Math.round(p%1*10)+'천원':p+'만원'); }
+function localAnswer(q){
+  const p=parse(q); let rows=search(p);
+  if(LISTQ.test(q)){
+    if(!rows.length) rows=search(Object.assign({},p,{keywords:''}));
+    const field=/변색|센서티|트랜지션/.test(q)?'photo':/코팅/.test(q)?'coat':/브랜드|시리즈/.test(q)?'brand':'prod';
+    const lab={photo:'변색 종류',coat:'코팅 종류',brand:'브랜드',prod:'제품'}[field];
+    const g=groupBy(field==='photo'?rows.filter(r=>r.photo):rows,field);
+    const who=p.company.map(c=>CONAME[c]).join('·')||'전체';
+    if(!g.length) return {text:who+' 자료에서 '+lab+'을(를) 찾지 못했어요.',rows:[]};
+    const lines=g.slice(0,15).map(x=>'· '+x.이름+'  —  '+(x.소비자가_최저_만원!=null?(field==='photo'?'적용가 ':'')+won(x.소비자가_최저_만원)+(x.소비자가_최고_만원!==x.소비자가_최저_만원?' ~ '+won(x.소비자가_최고_만원):''):'가격 미기재')+' ('+x.적용제품수+'개 제품, 출처 '+x.출처연도+')');
+    return {text:who+' '+(p.focus?p.focus+' ':'')+(p.index?p.index+' ':'')+lab+' '+g.length+'가지예요.\n'+lines.join('\n')+(g.length>15?'\n… 외 '+(g.length-15)+'가지':'')+(field==='photo'?'\n\n※ 변색 가격은 렌즈 기본가에 변색 추가금을 더한 금액이에요. 제품별 가격은 "호야 변색 마이셀프"처럼 물어보세요.':''),rows:[]};
+  }
+  if(!rows.length&&p.keywords){ rows=search(Object.assign({},p,{keywords:''})); }
+  if(!rows.length) return {text:'조건에 맞는 렌즈를 찾지 못했어요. 회사·굴절률·제품명·마크 중 하나만 넣어 다시 물어봐 주세요.\n예) "호야 1.60 누진 50만원 이하", "마크 LK13", "니콘 변색 단초점"',rows:[]};
+  const pr=rows.filter(r=>r.price!=null).map(r=>r.price);
+  const cond=[p.company.map(c=>CONAME[c]).join('·'),p.index,p.focus,p.supply,p.photochromic?'변색':'',p.mark?'마크 '+p.mark:'',p.keywords,p.maxPrice?p.maxPrice+'만원 이하':'',p.minPrice?p.minPrice+'만원 이상':''].filter(Boolean).join(' / ');
+  let t=(cond?'['+cond+'] ':'')+rows.length+'건 찾았어요.';
+  if(pr.length) t+=' 소비자가 '+won(Math.min(...pr))+' ~ '+won(Math.max(...pr))+' (50% 할인가 '+won(Math.min(...pr)/2)+' ~ '+won(Math.max(...pr)/2)+').';
+  t+=p.sort==='price-desc'?' 가격 높은 순으로 보여드려요.':' 가격 낮은 순으로 보여드려요.';
+  return {text:t,rows:rows.slice(0,8),more:rows.length>8?rows.length-8:0,params:p};
+}
+const RULES=`너는 안경원 카운터에서 쓰는 "렌즈 마크/소비자가 검색" 앱의 상담 도우미다. 한국어로 간결하게 답한다.
+규칙:
+1) "~종류는?" 질문은 list_options, 가격·마크·사양은 search_lenses 도구로 앱 자료를 조회해서 답한다. 자료에 없는 가격을 지어내지 않는다.
+2) 가격을 말할 때 소비자가와 50% 할인가, 출처연도를 함께 적는다(예: 65만원 / 할인가 32만5천원 · 출처 2026). 출처연도가 2012·2018·연도미상이면 "오래된 자료"라고 알린다.
+3) 앱 자료에 없는 내용(렌즈 원리, 추천 기준, 다른 회사 일반 정보 등)은 일반 지식으로 답하되 문장 앞에 "[일반 정보]"를 붙이고, 최신 가격·사양은 제조사 확인이 필요하다고 말한다. 인터넷 실시간 검색은 할 수 없다.
+4) 추천을 요청하면 도수·나이·용도·예산을 확인하는 질문을 한두 개 하고, 조회한 제품 2~4개를 비교해 제시한다.
+5) 의학적 진단은 하지 않는다. 답은 12줄 이내, 표가 필요하면 간단한 목록으로.`;
+const TOOL2={name:'list_options',description:'조건에 맞는 자료에서 변색 종류(photo)·코팅 종류(coat)·브랜드(brand)·제품(prod)의 목록을 중복 없이 돌려준다. 각 항목에 적용 제품 수, 소비자가 최저/최고(만원), 출처연도가 붙는다. "~종류는?" 같은 질문에 먼저 쓴다.',
+ inputSchema:{type:'object',properties:{field:{type:'string',enum:['photo','coat','brand','prod']},company:{type:'array',items:{type:'string',enum:CO.slice(1).map(c=>c[0])}},index:{type:'string'},focus:{type:'string',enum:['단초점','누진다초점','사무용','근시억제','다초점']},keywords:{type:'string'}},required:['field']},
+ execute(input){ let rows=search(Object.assign({pricedOnly:false},input,{photochromic:input.field==='photo'?true:undefined})); return groupBy(rows,String(input.field||'prod')).slice(0,40); }};
+const TOOL={name:'search_lenses',description:'앱의 렌즈 가격/마크 자료를 조건으로 검색해 최대 limit개 행(회사, 제품, 초점, 굴절률, 공급, 코팅, 변색, 마크, 소비자가_만원, 할인가50_만원, 출처연도, 메모, 추가비용)과 전체 건수를 돌려준다. 제품명·코팅 등은 keywords에 넣는다.',
+ inputSchema:{type:'object',properties:{company:{type:'array',items:{type:'string',enum:CO.slice(1).map(c=>c[0])},description:'회사 코드'},keywords:{type:'string',description:'제품명/코팅/설명 키워드(공백 구분, 한국어)'},index:{type:'string',description:'굴절률 예 1.60, 1.67, 1.60양비'},focus:{type:'string',enum:['단초점','누진다초점','사무용','근시억제','다초점']},supply:{type:'string',enum:['RX','여벌']},photochromic:{type:'boolean'},mark:{type:'string',description:'렌즈 각인 일부'},minPrice:{type:'number'},maxPrice:{type:'number'},pricedOnly:{type:'boolean'},sort:{type:'string',enum:['price-asc','price-desc']},limit:{type:'number'}}},
+ execute(input){ const rows=search(Object.assign({pricedOnly:false},input)); const lim=Math.min(Math.max(Number(input.limit)||15,1),25); return {total:rows.length,rows:rows.slice(0,lim).map(compact)}; }};
+
+/* UI */
+const css=document.createElement('style');
+css.textContent=`
+.chat-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;font-family:var(--display);font-size:18px;background:var(--grape);color:#fff;border:2px solid var(--ink);border-radius:999px;padding:11px 18px 10px;box-shadow:0 5px 0 var(--ink);cursor:pointer;display:flex;align-items:center;gap:8px}
+.chat-fab:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.chat-dot{width:10px;height:10px;border-radius:50%;background:var(--yellow);border:2px solid var(--ink)}
+.chat{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:41;width:min(420px,calc(100vw - 32px));height:min(640px,calc(100vh - 48px));background:var(--surface);border:2px solid var(--ink);border-radius:24px;box-shadow:0 8px 0 rgba(42,34,70,.18);display:flex;flex-direction:column;overflow:hidden}
+.chat-h{display:flex;align-items:center;gap:10px;padding:12px 14px;background:color-mix(in srgb,var(--grape) 16%,var(--surface));border-bottom:2px solid var(--ink)}
+.chat-h b{font-family:var(--display);font-weight:400;font-size:19px}
+.chat-h .mode{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--surface);border:1.5px solid var(--line);color:var(--muted)}
+.chat-h .mode.ai{background:var(--mint);color:#fff;border-color:transparent}
+.chat-h button{margin-left:auto;font:inherit;font-size:20px;line-height:1;background:none;border:0;cursor:pointer;color:var(--ink);padding:4px 8px}
+.chat-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:88%;padding:9px 12px;border-radius:16px;white-space:pre-wrap;line-height:1.55;font-size:13.5px;word-break:break-word}
+.msg.u{align-self:flex-end;background:var(--grape);color:#fff;border-bottom-right-radius:4px}
+.msg.b{align-self:flex-start;background:var(--surface-2);border:1.5px solid var(--line);border-bottom-left-radius:4px}
+.msg.b.err{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.hits{display:grid;gap:6px;margin-top:8px}
+.hit{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:7px 10px;font-size:12.5px;white-space:normal}
+.hit .n{font-weight:700}
+.hit .p{text-align:right;font-family:var(--display);font-size:15px;color:var(--pink)}
+.hit .s{grid-column:1/-1;color:var(--muted);font-size:11.5px}
+.hit .y{font-family:var(--mono);font-size:10.5px;border-radius:999px;padding:0 6px;background:color-mix(in srgb,var(--mint) 18%,var(--surface))}
+.hit .y.old{background:var(--warn-soft);color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
+.chips button{font:inherit;font-size:12px;border:1.5px solid color-mix(in srgb,var(--grape) 40%,var(--line));background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 10px;cursor:pointer}
+.chat-f{display:flex;gap:8px;padding:10px 12px;border-top:2px solid var(--line)}
+.chat-f textarea{flex:1;resize:none;height:44px;font:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
+.chat-f button{font-family:var(--display);font-size:16px;background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:14px;padding:0 14px;cursor:pointer}
+.chat-note{font-size:11px;color:var(--muted);padding:0 14px 8px}
+@media (max-width:520px){.chat{right:8px;left:8px;width:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));height:calc(100% - 16px)}}
+`;
+document.head.appendChild(css);
+const fab=document.createElement('button'); fab.className='chat-fab'; fab.type='button'; fab.innerHTML='<span class="chat-dot"></span>AI 렌즈 상담';
+const box=document.createElement('section'); box.className='chat'; box.hidden=true; box.setAttribute('aria-label','AI 렌즈 상담');
+box.innerHTML=`<div class="chat-h"><b>AI 렌즈 상담</b><span class="mode" id="chatMode">자료 검색</span><button type="button" id="chatClose" aria-label="닫기">×</button></div>
+<div class="chat-log" id="chatLog" aria-live="polite"></div>
+<div class="chips" id="chatChips"></div>
+<div class="chat-note" id="chatNote">앱에 들어 있는 가격표 자료에서 찾아 답해요.</div>
+<form class="chat-f" id="chatForm"><textarea id="chatIn" placeholder="예) 호야 1.60 누진 50만원 이하 추천" aria-label="질문"></textarea><button type="submit" id="chatSend">보내기</button></form>`;
+document.body.append(fab,box);
+const log=box.querySelector('#chatLog'), inp=box.querySelector('#chatIn'), note=box.querySelector('#chatNote'), modeEl=box.querySelector('#chatMode'), sendBtn=box.querySelector('#chatSend');
+const EX=['호야 변색렌즈 종류는?','호야 1.60 누진 50만원 이하','마크 LK13 뭐야?','니콘 변색 단초점 가격','1.67양비 단초점 비교','초기 노안 첫 누진 추천해줘','바리락스 XR Pro 1.74 할인가'];
+EX.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{inp.value=t;ask();};box.querySelector('#chatChips').append(b);});
+function bubble(cls,text){ const d=document.createElement('div'); d.className='msg '+cls; d.textContent=text; log.append(d); log.scrollTop=log.scrollHeight; return d; }
+function hitsHtml(rows,more){
+  const w=document.createElement('div'); w.className='hits';
+  rows.forEach(r=>{ const h=document.createElement('div'); h.className='hit';
+    const old=!/^20(2[4-9]|3)/.test(r.year||'');
+    h.innerHTML=`<span class="n"></span><span class="p"></span><span class="s"></span>`;
+    h.querySelector('.n').textContent=(CONAME[r.co]||r.co)+' '+r.prod;
+    h.querySelector('.p').textContent=r.price!=null?won(r.price):'—';
+    h.querySelector('.s').textContent=[r.idx+(r.dasp?' 양비':''),r.focus,r.sup,r.coat,r.photo?('변색 '+r.photo):'',r.mark?('마크 '+r.mark):'',r.price!=null?('할인가 '+won(r.price/2)):''].filter(Boolean).join(' · ')+' ';
+    const y=document.createElement('span'); y.className='y'+(old?' old':''); y.textContent='출처 '+(r.year||'-'); h.querySelector('.s').append(y);
+    w.append(h); });
+  if(more){ const m=document.createElement('div'); m.className='hit'; m.style.gridTemplateColumns='1fr'; m.textContent='그 외 '+more+'건 더 있어요. 조건을 더 좁혀 보세요.'; w.append(m); }
+  return w;
+}
+let sample=null, turns=[], busy=false, ctl=null;
+bubble('b','안녕하세요! 렌즈 가격·마크·사양을 물어보세요.\n회사, 굴절률, 누진/단초점, 변색, 예산, 마크(예: LK13)를 넣으면 더 정확해요.');
+fab.onclick=()=>{ box.hidden=false; fab.hidden=true; inp.focus(); };
+box.querySelector('#chatClose').onclick=()=>{ if(ctl) ctl.abort(); box.hidden=true; fab.hidden=false; };
+box.querySelector('#chatForm').addEventListener('submit',e=>{e.preventDefault();ask();});
+inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); ask(); } });
+(async()=>{ try{ if(window.claude&&claude.use){ const s=await claude.use('sample'); if(s){ const lim=await s.limits().catch(()=>null); if(lim&&lim.tools){ sample=s; modeEl.textContent='AI 답변'; modeEl.classList.add('ai'); note.textContent='Claude가 앱 자료를 조회해 답해요. 자료 밖 내용은 [일반 정보]로 표시돼요. 처음 한 번 사용 허용을 물어요.'; } } } }catch(e){} })();
+async function ask(){
+  const q=inp.value.trim(); if(!q||busy) return;
+  inp.value=''; bubble('u',q);
+  if(!sample){ const a=localAnswer(q); const d=bubble('b',a.text); if(a.rows.length) d.append(hitsHtml(a.rows,a.more)); log.scrollTop=log.scrollHeight; return; }
+  busy=true; sendBtn.textContent='중지'; sendBtn.type='button'; ctl=new AbortController();
+  const stop=()=>ctl&&ctl.abort(); sendBtn.onclick=stop;
+  const d=bubble('b','생각하는 중…');
+  turns.push({role:'user',content:q}); if(turns.length>10) turns=turns.slice(-10);
+  if(turns[0].role!=='user') turns.shift();
+  try{
+    const {text,truncated}=await sample([{role:'user',content:RULES},...turns],{cache:false,signal:ctl.signal,tools:[Object.assign({},TOOL,{execute(i){ d.textContent='앱 자료 조회 중…'; return TOOL.execute(i); }}),Object.assign({},TOOL2,{execute(i){ d.textContent='앱 자료 조회 중…'; return TOOL2.execute(i); }})],onText:({text})=>{ d.textContent=text; log.scrollTop=log.scrollHeight; }});
+    d.textContent=text+(truncated?'\n\n(답이 길어 중간에 끊겼어요. 질문을 나눠 주세요.)':'');
+    turns.push({role:'assistant',content:text});
+  }catch(e){
+    const code=e&&e.code;
+    if(code==='cancelled'){ d.textContent=(e.text||'')+'\n(중지됨)'; }
+    else if(['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed','tools_unavailable'].includes(code)){
+      sample=null; modeEl.textContent='자료 검색'; modeEl.classList.remove('ai'); note.textContent='AI 답변을 쓸 수 없어 앱 자료 검색으로 답해요.';
+      const a=localAnswer(q); d.textContent=a.text; if(a.rows.length) d.append(hitsHtml(a.rows,a.more)); turns.pop();
+    } else { d.classList.add('err'); d.textContent=(e.text?e.text+'\n\n':'')+(code==='rate_limited'?'요청이 많아요. 잠시 뒤 다시 보내 주세요.':code==='session_expired'?'다시 로그인해 주세요.':'답을 받지 못했어요. 다시 보내 주세요.'); turns.pop(); }
+  }finally{ busy=false; ctl=null; sendBtn.textContent='보내기'; sendBtn.type='submit'; sendBtn.onclick=null; log.scrollTop=log.scrollHeight; }
+}
+})();
+
 })();
 </script>
