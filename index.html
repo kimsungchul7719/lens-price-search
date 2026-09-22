@@ -1,0 +1,648 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>렌즈 소비자가 검색</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#f4f1ff; --surface:#ffffff; --surface-2:#f8f6ff; --ink:#2a2246; --muted:#6b6490; --line:#e4dff7;
+  --pink:#ff4f93; --orange:#ff8a1f; --yellow:#ffc933; --mint:#12b89a; --sky:#3593ff; --grape:#8a5cf6; --red:#ff3b4f;
+  --on-yellow:#3a2a00;
+  --accent:var(--grape); --accent-ink:#ffffff; --accent-soft:#efe8ff;
+  --photo:#8a5cf6; --photo-soft:#efe8ff; --warn:#b35c00; --warn-soft:#fff0dc;
+  --hoya:#2f6bff; --essilor:#0fa58a; --nikon:#d08a00;
+  --shadow:0 6px 0 rgba(42,34,70,.08);
+  --display:"Jua","IBM Plex Sans KR",system-ui,sans-serif;
+  --sans:"IBM Plex Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#16122a; --surface:#221c3e; --surface-2:#2a2349; --ink:#f1edff; --muted:#aaa2cf; --line:#3a3163;
+  --pink:#ff74aa; --orange:#ffa24d; --yellow:#ffd65c; --mint:#3fd9bb; --sky:#6aafff; --grape:#a98bff; --red:#ff5a6b;
+  --accent-ink:#1a1233; --accent-soft:#332a5c; --photo:#b9a0ff; --photo-soft:#332a5c; --warn:#ffbe6b; --warn-soft:#3d2c16;
+  --hoya:#86a8ff; --essilor:#4fdcbf; --nikon:#ffd05c; --shadow:0 6px 0 rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  --ground:#16122a; --surface:#221c3e; --surface-2:#2a2349; --ink:#f1edff; --muted:#aaa2cf; --line:#3a3163;
+  --pink:#ff74aa; --orange:#ffa24d; --yellow:#ffd65c; --mint:#3fd9bb; --sky:#6aafff; --grape:#a98bff; --red:#ff5a6b;
+  --accent-ink:#1a1233; --accent-soft:#332a5c; --photo:#b9a0ff; --photo-soft:#332a5c; --warn:#ffbe6b; --warn-soft:#3d2c16;
+  --hoya:#86a8ff; --essilor:#4fdcbf; --nikon:#ffd05c; --shadow:0 6px 0 rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;padding-inline:16px;padding-block:20px 56px}
+.wrap{max-width:1280px;margin:0 auto;display:grid;gap:22px}
+
+/* ---- hero ---- */
+.hero{position:relative;overflow:hidden;background:var(--surface);border:2px solid var(--ink);border-radius:28px;box-shadow:var(--shadow);padding:26px 26px 22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;z-index:0;opacity:.55}
+.hero::before{width:220px;height:220px;right:-60px;top:-90px;background:var(--yellow)}
+.hero::after{width:140px;height:140px;left:-50px;bottom:-70px;background:var(--mint)}
+.hero > *{position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:var(--pink);color:#fff;border-radius:999px;padding:4px 12px;letter-spacing:.04em}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,5vw,46px);line-height:1.1;margin:10px 0 6px;letter-spacing:-.01em;text-wrap:balance}
+h1 .hl{background:linear-gradient(transparent 58%, color-mix(in srgb,var(--sky) 45%,transparent) 58%);padding:0 4px}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.srcs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.src{font-size:12px;font-weight:600;border-radius:999px;padding:4px 11px;border:2px solid var(--ink);background:var(--surface)}
+.src:nth-child(1){background:color-mix(in srgb,var(--sky) 22%,var(--surface))}
+.src:nth-child(2){background:color-mix(in srgb,var(--mint) 22%,var(--surface))}
+.src:nth-child(3){background:color-mix(in srgb,var(--yellow) 30%,var(--surface))}
+.src:nth-child(4){background:color-mix(in srgb,var(--pink) 18%,var(--surface))}
+.specs{width:170px;max-width:100%;height:auto}
+@media (max-width:640px){.hero{grid-template-columns:1fr;padding:22px 18px}.specs{width:120px;justify-self:end;margin-top:-6px}}
+
+/* ---- section headings ---- */
+.sec-h{display:flex;align-items:center;gap:10px;margin:0;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.2}
+.sec-h .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:12px;border:2px solid var(--ink);font-size:17px;color:#fff;box-shadow:0 3px 0 rgba(42,34,70,.15)}
+.sec-h.s1 .num{background:var(--grape)} .sec-h.s2 .num{background:var(--pink)} .sec-h.s3 .num{background:var(--orange)}
+.sec-h small{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:500}
+
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:880px){.layout{grid-template-columns:1fr}}
+
+/* ---- filter panel ---- */
+aside{background:var(--surface);border:2px solid var(--ink);border-radius:24px;box-shadow:var(--shadow);padding:18px;display:grid;gap:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:880px){aside{position:static}}
+.f{display:grid;gap:7px;padding:10px 12px 12px;border-radius:16px;background:color-mix(in srgb,var(--c) 9%,var(--surface))}
+.f > label,.f > .flabel{justify-self:start;display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:400;font-size:15px;letter-spacing:.01em;background:var(--c);color:var(--c-ink,#fff);border-radius:999px;padding:3px 12px 2px 8px;line-height:1.4}
+.f > label::before,.f > .flabel::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c-ink,#fff);opacity:.9}
+.f.grape{--c:var(--grape)} .f.pink{--c:var(--pink)} .f.sky{--c:var(--sky)} .f.mint{--c:var(--mint)} .f.orange{--c:var(--orange)} .f.yellow{--c:var(--yellow);--c-ink:var(--on-yellow)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+select,input[type=text],input[type=search],input[type=number]{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:2px solid color-mix(in srgb,var(--c,var(--grape)) 35%,var(--line));border-radius:12px;padding:8px 11px}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid color-mix(in srgb,var(--c,var(--grape)) 60%,transparent);outline-offset:1px}
+.mkrow{display:grid;grid-template-columns:88px 1fr;gap:6px}
+input.markin{font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.seg{display:flex;flex-wrap:wrap;gap:5px}
+.seg button{font:inherit;font-size:13px;font-weight:600;border:2px solid color-mix(in srgb,var(--c) 40%,var(--line));background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer}
+.seg button:hover{border-color:var(--c)}
+.seg button[aria-pressed="true"]{background:var(--c);color:var(--c-ink,#fff);border-color:var(--c)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px}
+.chk input{accent-color:var(--grape);width:16px;height:16px}
+.go{font-family:var(--display);font-weight:400;font-size:20px;background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:16px;padding:10px;cursor:pointer;box-shadow:0 5px 0 var(--ink);letter-spacing:.04em}
+.go:hover{filter:brightness(1.05)}
+.go:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.reset{font:inherit;font-size:13px;font-weight:600;background:var(--surface-2);border:2px dashed var(--line);color:var(--muted);border-radius:14px;padding:8px;cursor:pointer}
+.reset:hover{color:var(--ink);border-color:var(--muted)}
+
+/* ---- results ---- */
+main{display:grid;gap:14px;min-width:0}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.count{font-size:13px;color:var(--muted);background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:5px 14px}
+.count b{color:var(--pink);font-size:17px;font-family:var(--display);font-weight:400}
+.bar select{width:auto;--c:var(--sky)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:2px solid var(--ink);border-radius:22px;box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:990px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+thead th{font-family:var(--display);font-weight:400;font-size:14px;color:var(--ink);background:color-mix(in srgb,var(--yellow) 32%,var(--surface));white-space:nowrap;border-bottom:2px solid var(--ink)}
+thead th:nth-child(2){background:color-mix(in srgb,var(--pink) 28%,var(--surface))}
+thead th:nth-child(3){background:color-mix(in srgb,var(--mint) 30%,var(--surface))}
+thead th:nth-child(4){background:color-mix(in srgb,var(--orange) 22%,var(--surface))}
+thead th:nth-child(5){background:color-mix(in srgb,var(--grape) 18%,var(--surface))}
+thead th:nth-child(6){background:color-mix(in srgb,var(--mint) 20%,var(--surface))}
+thead th:nth-child(7){background:color-mix(in srgb,var(--sky) 18%,var(--surface))}
+thead th:nth-child(8){background:color-mix(in srgb,var(--pink) 16%,var(--surface))}
+thead th:nth-child(4){background:color-mix(in srgb,var(--red) 22%,var(--surface))}
+thead th:nth-child(5){background:color-mix(in srgb,var(--orange) 22%,var(--surface))}
+thead th:nth-child(6){background:color-mix(in srgb,var(--grape) 18%,var(--surface))}
+thead th:nth-child(7){background:color-mix(in srgb,var(--mint) 20%,var(--surface))}
+thead th:nth-child(8){background:color-mix(in srgb,var(--sky) 18%,var(--surface))}
+thead th:nth-child(9){background:color-mix(in srgb,var(--pink) 16%,var(--surface))}
+.pbox.sale{background:color-mix(in srgb,var(--red) 12%,var(--surface));box-shadow:0 3px 0 color-mix(in srgb,var(--red) 55%,transparent)}
+.pbox.sale .plabel{color:var(--red)}
+.pbox.sale .price{color:var(--red)}
+td.yrcell{white-space:nowrap;text-align:center}
+.ybox{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:5px 9px 4px;border-radius:14px;border:2px solid var(--ink);background:color-mix(in srgb,var(--mint) 20%,var(--surface));font-family:var(--display);font-size:16px;line-height:1.15}
+.ybox.old{background:var(--warn-soft);color:var(--warn)}
+.ylabel{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.open{background:var(--accent-soft)}
+tbody tr:last-child td{border-bottom:0}
+td.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.co{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:1px 8px;color:#fff;background:var(--grape)}
+.co.HOYA{background:var(--hoya)} .co.ESSILOR{background:var(--essilor)} .co.NIKON{background:var(--nikon)}
+.co.ZEISS{background:var(--sky)} .co.RODENSTOCK{background:var(--orange)} .co.SHAMIR{background:var(--mint)} .co.SEIKO{background:var(--pink)} .co.TOKAI{background:var(--grape)} .co.KODAK{background:var(--yellow);color:var(--on-yellow)} .co.CHEMI,.co.DAEMYUNG,.co.HANMI{background:var(--red)}
+.prod{font-weight:700;margin-top:3px}
+.brand{font-size:12px;color:var(--muted)}
+.idx{font-family:var(--mono);font-weight:600}
+.pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px;margin:1px 3px 1px 0;white-space:nowrap;border:1.5px solid var(--line);color:var(--muted)}
+.pill.ph{background:var(--photo-soft);color:var(--photo);border-color:transparent}
+.pill.sv{background:var(--surface-2)}
+.pill.yr{font-family:var(--mono);background:color-mix(in srgb,var(--mint) 16%,var(--surface));color:var(--ink);border-color:transparent}
+.pill.yr.old{background:var(--warn-soft);color:var(--warn)}
+.pill.ref{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.dl a{color:var(--sky);word-break:break-all}
+.mark{font-family:var(--mono);font-size:12px;letter-spacing:.05em;background:var(--surface-2);border:1.5px dashed var(--grape);border-radius:8px;padding:1px 7px;white-space:nowrap;display:inline-block}
+.pbox{display:inline-flex;flex-direction:column;align-items:center;text-align:center;min-width:122px;padding:7px 12px 6px;border:2px solid var(--ink);background:color-mix(in srgb,var(--pink) 14%,var(--surface));border-radius:16px;line-height:1.25;box-shadow:0 3px 0 color-mix(in srgb,var(--pink) 55%,transparent)}
+.plabel{font-size:10px;font-weight:700;color:var(--pink);letter-spacing:.08em}
+.price{font-family:var(--display);font-weight:400;font-size:21px;color:var(--ink)}
+.price small{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);margin-left:1px}
+.won{display:block;font-size:11px;color:var(--muted)}
+.na{color:var(--warn);font-size:12px;font-weight:600;background:var(--warn-soft);padding:3px 9px;border-radius:999px;white-space:nowrap}
+tr.detail td{background:var(--surface-2);cursor:default;padding:14px 18px}
+.dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;font-size:13px}
+.dl dt{font-weight:700;color:var(--grape)}
+.dl dd{margin:0}
+.empty{padding:44px 16px;text-align:center;color:var(--muted);line-height:1.8}
+.empty b{color:var(--red)}
+.note{background:var(--surface);border:2px dashed var(--line);border-radius:20px;padding:14px 18px;display:grid;gap:8px}
+.foot{font-size:12px;color:var(--muted);line-height:1.7;margin:0}
+@media (prefers-reduced-motion:no-preference){tbody tr{transition:background .12s}.go,.seg button{transition:transform .08s,box-shadow .08s,background .12s}}
+/* ---- 비밀번호 잠금 ---- */
+.lock{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:var(--ground)}
+.lock-card{width:min(360px,100%);background:var(--surface);border:2px solid var(--ink);border-radius:26px;box-shadow:var(--shadow);padding:26px 22px;display:grid;gap:12px;text-align:center}
+.lock-card h2{font-family:var(--display);font-weight:400;font-size:26px;margin:0}
+.lock-card p{margin:0;color:var(--muted);font-size:13px}
+.lock-card input{--c:var(--grape);text-align:center;font-size:22px;letter-spacing:.4em;font-family:var(--mono)}
+.lock-err{color:var(--red);font-size:13px;font-weight:600;min-height:1.2em}
+body.locked .wrap{display:none}
+</style>
+
+<div class="lock" id="lock">
+  <form class="lock-card" id="lockForm" autocomplete="off">
+    <svg viewBox="0 0 200 80" width="120" style="justify-self:center" aria-hidden="true"><circle cx="58" cy="40" r="30" fill="var(--sky)" fill-opacity=".35" stroke="var(--ink)" stroke-width="6"/><circle cx="142" cy="40" r="30" fill="var(--pink)" fill-opacity=".35" stroke="var(--ink)" stroke-width="6"/><path d="M88 36 Q100 26 112 36" fill="none" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/></svg>
+    <h2>렌즈 소비자가 검색</h2>
+    <p>비밀번호를 입력하면 열려요</p>
+    <input id="pw" type="password" inputmode="numeric" maxlength="12" aria-label="비밀번호" autofocus>
+    <div class="lock-err" id="pwErr" role="alert"></div>
+    <button class="go" type="submit">열기</button>
+  </form>
+</div>
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <span class="eyebrow">안경원 카운터용 · 2026</span>
+      <h1>렌즈 <span class="hl">소비자가</span> 검색</h1>
+      <p class="sub">회사·렌즈종류·굴절률·변색·렌즈마크로 권장소비자가를 바로 찾아요. 단위는 만원, 행을 누르면 추가비용과 출처가 펼쳐져요.</p>
+      <div class="srcs">
+        <span class="src">호야 컨설팅북 2026</span>
+        <span class="src">에실로 가격표 2026 v1</span>
+        <span class="src">에실로 Sales &amp; Technical Guide 2026 v1</span>
+        <span class="src">타사 각인 웹 조사 2026-09 (참고)</span>
+      </div>
+    </div>
+    <svg class="specs" viewBox="0 0 200 110" aria-hidden="true">
+      <path d="M20 40 Q10 30 4 34" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" style="color:var(--ink)"/>
+      <path d="M180 40 Q190 30 196 34" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" style="color:var(--ink)"/>
+      <circle cx="58" cy="58" r="38" fill="var(--sky)" fill-opacity=".35" stroke="var(--ink)" stroke-width="6"/>
+      <circle cx="142" cy="58" r="38" fill="var(--pink)" fill-opacity=".35" stroke="var(--ink)" stroke-width="6"/>
+      <path d="M96 52 Q100 44 104 52" fill="none" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M40 44 Q48 36 58 38" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+      <path d="M124 44 Q132 36 142 38" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="46" cy="74" r="4" fill="var(--ink)"/><circle cx="70" cy="74" r="4" fill="var(--ink)"/>
+      <circle cx="130" cy="74" r="4" fill="var(--ink)"/><circle cx="154" cy="74" r="4" fill="var(--ink)"/>
+      <path d="M52 86 Q58 92 64 86" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M136 86 Q142 92 148 86" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="36" cy="84" rx="7" ry="4" fill="var(--pink)" opacity=".7"/><ellipse cx="164" cy="84" rx="7" ry="4" fill="var(--pink)" opacity=".7"/>
+    </svg>
+  </header>
+
+  <div class="layout">
+    <aside aria-label="검색 조건">
+      <h2 class="sec-h s1"><span class="num">1</span>검색 조건 고르기</h2>
+      <div class="f grape">
+        <label for="q">통합 검색</label>
+        <input id="q" type="search" placeholder="제품명·코팅·메모 (예: 마이셀프, 운전)">
+      </div>
+      <div class="f pink">
+        <label for="mk">렌즈마크로 렌즈종류 찾기</label>
+        <div class="mkrow">
+          <select id="mkType" aria-label="렌즈마크 구분">
+            <option value="">전체</option>
+            <option value="sv">단초점</option>
+            <option value="multi">다초점</option>
+          </select>
+          <input id="mk" class="markin" type="text" placeholder="예: MY*5, LK13, Ni3">
+        </div>
+      </div>
+      <div class="f sky">
+        <span class="flabel">회사</span>
+        <div class="seg" id="coSeg" role="group" aria-label="회사"></div>
+      </div>
+      <div class="f mint">
+        <label for="brand">렌즈종류(브랜드)</label>
+        <select id="brand"></select>
+      </div>
+      <div class="f orange">
+        <span class="flabel">초점 구분</span>
+        <div class="seg" id="focusSeg" role="group" aria-label="초점 구분"></div>
+      </div>
+      <div class="f yellow">
+        <span class="flabel">굴절률</span>
+        <div class="seg" id="idxSeg" role="group" aria-label="굴절률"></div>
+      </div>
+      <div class="f sky">
+        <span class="flabel">공급 구분</span>
+        <div class="seg" id="supSeg" role="group" aria-label="공급 구분"></div>
+      </div>
+      <div class="f grape">
+        <label for="photo">변색</label>
+        <select id="photo"></select>
+      </div>
+      <div class="f mint">
+        <label for="coat">코팅</label>
+        <select id="coat"></select>
+      </div>
+      <div class="f pink">
+        <span class="flabel">가격 범위 (만원)</span>
+        <div class="row2">
+          <input id="pmin" type="number" min="0" inputmode="numeric" placeholder="최저" aria-label="최저가(만원)">
+          <input id="pmax" type="number" min="0" inputmode="numeric" placeholder="최고" aria-label="최고가(만원)">
+        </div>
+        <div><label class="chk"><input id="priced" type="checkbox" checked> 가격 있는 항목만 <span class="brand">(마크 검색 시 무시)</span></label></div>
+      </div>
+      <button class="go" id="go" type="button">검색하기</button>
+      <button class="reset" id="reset" type="button">조건 초기화</button>
+    </aside>
+
+    <main>
+      <h2 class="sec-h s2"><span class="num">2</span>검색 결과 <small>소비자가 · 렌즈마크 · 출처연도</small></h2>
+      <div class="bar">
+        <div class="count" id="count"></div>
+        <label class="chk" for="sort">정렬
+          <select id="sort">
+            <option value="price-asc">가격 낮은순</option>
+            <option value="price-desc">가격 높은순</option>
+            <option value="name">제품명순</option>
+            <option value="idx">굴절률순</option>
+          </select>
+        </label>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>회사 / 제품</th><th style="text-align:center">소비자가</th><th style="text-align:center">출처연도</th><th style="text-align:center">50% 할인가</th><th>초점</th><th>굴절률</th><th>공급</th><th>코팅 · 변색</th><th>렌즈마크</th>
+          </tr></thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+      <section class="note">
+        <h2 class="sec-h s3"><span class="num">!</span>알아두세요</h2>
+        <p class="foot">
+          · 변색 행의 가격은 해당 굴절률 기본 코팅가(호야: 메이리오 / 에실로: Crizal Rock)에 변색 추가금을 더한 금액입니다. (하이럭스 1.50 변색은 표기된 단가 그대로)<br>
+          · 호야 1.55/1.50 칸은 메이리오=1.50, 메이리오 컨트롤=1.55 기준이며, 1.55 주문 시 각인 끝자리 “1L”이 “2L”로 표기됩니다.<br>
+          · 바리락스·니콘은 제공 자료에 가격이 없어 사양(각인·도수범위)만 조회됩니다. 각인 아이콘은 글자로 근사 표기했습니다.<br>
+          · <b>참고</b> 배지가 붙은 자이스·로덴스톡·샤미르·세이코·도카이·코닥·케미·대명·한미 항목은 2026년 9월 웹 조사 결과입니다. 세이코·도카이는 2012년 일본 자료, 국산은 업계지·커뮤니티 기반이라 실제 렌즈·제조사 자료로 확인 후 사용하세요. 행을 누르면 출처 링크가 보입니다.<br>
+          · 권장소비자가이며 안경원 정책·검안 수가에 따라 실제 판매가는 다를 수 있습니다.
+        </p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  const H='a3723fca82e0ce5d86d485488fdcff86e2b82f2cc1b82d12d50408ef589b9789';
+  const body=document.body, lock=document.getElementById('lock');
+  function open(){ body.classList.remove('locked'); lock.hidden=true; try{sessionStorage.setItem('lensUnlock','1');}catch(e){} }
+  let ok=false; try{ ok=sessionStorage.getItem('lensUnlock')==='1'; }catch(e){}
+  if(ok){ lock.hidden=true; return; }
+  body.classList.add('locked');
+  async function hash(t){
+    if(window.crypto&&crypto.subtle){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('lens-salt:'+t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+    return null;
+  }
+  document.getElementById('lockForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const v=document.getElementById('pw').value.trim(); const h=await hash(v);
+    if(h===H || (h===null && v==='33'+'44')) open();
+    else { document.getElementById('pwErr').textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.'; document.getElementById('pw').select(); }
+  });
+})();
+</script>
+<script>
+(function(){
+const R=[]; // rows
+function add(o){R.push(Object.assign({co:'',brand:'',prod:'',focus:'',idx:'',sup:'RX',coat:'',photo:'',price:null,mark:'',extra:'',note:'',range:''},o));}
+
+/* ---------------- HOYA ---------------- */
+const HP_STD=[['센서티3 (썬프로)',25],['센서티3 (메이리오)',20],['센서티 컬러 (썬프로·반미러)',20],['센서티2·다크·샤인·패스트',15]];
+const HP_MY =[['센서티3 (썬프로)',20],['센서티3 (메이리오)',20],['센서티 컬러 (썬프로·반미러)',20],['센서티2·다크·샤인·패스트',15]];
+const HX_PROG='기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정·1.67, 1.74 -4.00 난시 초과 +4만원';
+// cols: [idx, 메이리오, 메이리오컨트롤, mark, 변색가능]
+function hoya(brand,prod,focus,cols,photo,extra,note){
+  cols.forEach(([idx,mei,ctl,mark,ph])=>{
+    const split=idx==='1.55/1.50';
+    const iM=split?'1.50':idx, iC=split?'1.55':idx;
+    const mC=split?mark.replace(/1L/g,'2L'):mark;
+    if(mei!=null) add({co:'HOYA',brand,prod,focus,idx:iM,coat:'메이리오',price:mei,mark,extra,note});
+    if(ctl!=null) add({co:'HOYA',brand,prod,focus,idx:iC,coat:'메이리오 컨트롤',price:ctl,mark:mC,extra,note:(note?note+' · ':'')+'메이리오 컨트롤: 1.74 및 착색 불가'});
+    if(ph&&photo&&mei!=null) photo.forEach(([n,a])=>add({co:'HOYA',brand,prod,focus,idx:iM,coat:n.includes('썬프로')?'썬프로':'메이리오',photo:n,price:mei+a,mark,extra,note:(note?note+' · ':'')+'변색 추가 +'+a+'만원 포함'}));
+  });
+}
+const P='누진다초점';
+hoya('마이셀프','마이셀프',P,[['1.74',270,null,'MY*7',0],['1.67',230,230,'MY*5',1],['1.60',190,190,'MY*3',1],['1.55/1.50',170,170,'MY*1L',1]],HP_MY,'기본 사양: 프리즘·착색·METS·외경지정 / 1.67, 1.74 -4.00 난시 초과 +4만원','누진대 11~16mm 선택(*에 누진대 일의자리)');
+hoya('마이셀프','마이셀프 프로파일',P,[['1.74',150,null,'MYP*7',0],['1.67',130,130,'MYP*5',1],['1.60',120,120,'MYP*3',1],['1.55/1.50',110,110,'MYP*1L',1]],HP_MY,'기본 사양: 프리즘·착색·METS·외경지정 / 1.67, 1.74 -4.00 난시 초과 +4만원','디자인 M(모던)·A(어드벤처)·S(스테이블)·E(엑스퍼트)·D(디테일)');
+hoya('라이프스타일4','라이프스타일4 인디비주얼',P,[['1.74',130,null,'LSI*7◆',0],['1.67',110,115,'LSI*5◆',1],['1.60',100,105,'LSI*3◆',1],['1.55/1.50',90,95,'LSI*1L◆',1]],HP_STD,HX_PROG,'◆ 디자인 I(인도어)·U(어반)·O(아웃도어)');
+hoya('라이프스타일4','라이프스타일4',P,[['1.74',115,null,'LS*7◆',0],['1.67',95,100,'LS*5◆',1],['1.60',85,90,'LS*3◆',1],['1.55/1.50',75,80,'LS*1L◆',1]],HP_STD,HX_PROG,'◆ 디자인 I(인도어)·U(어반)·O(아웃도어)');
+hoya('발란시스','발란시스 KR 인디비주얼',P,[['1.74',105,null,'LKI17 / LKI47',0],['1.67',85,90,'LKI15 / LKI45',1],['1.60',75,80,'LKI13 / LKI43',1],['1.55/1.50',65,70,'LKI1L / LKI41L',1]],HP_STD,HX_PROG,'각인 11mm / 14mm 누진대');
+hoya('발란시스','발란시스 KR',P,[['1.74',93,null,'LK17 / LK47',0],['1.67',78,83,'LK15 / LK45',1],['1.60',68,73,'LK13 / LK43',1],['1.55/1.50',58,63,'LK1L / LK41L',1]],HP_STD,HX_PROG,'각인 11mm / 14mm 누진대');
+hoya('발란시스','발란시스',P,[['1.74',88,null,'LB17 / LB47',0],['1.67',73,78,'LB15 / LB45',1],['1.60',63,68,'LB13 / LB43',1],['1.55/1.50',53,58,'LB1L / LB41L',1]],HP_STD,HX_PROG,'각인 11mm / 14mm 누진대');
+const HX_DYN='기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정·1.50, 1.60, 1.67 -4.00 난시 초과 +4만원';
+hoya('다이나믹 KR','다이나믹 프리미엄 KR 인디비주얼',P,[['1.67',68,73,'DPI15 / DPI45',1],['1.60',58,63,'DPI13 / DPI43',1],['1.55/1.50',48,53,'DPI11L / DPI41L',1]],HP_STD,HX_DYN,'각인 11mm / 14mm 누진대 · 한국인 전용 설계로 (-)마크 없음');
+hoya('다이나믹 KR','다이나믹 프리미엄 KR',P,[['1.67',63,68,'DPK15 / DPK45',1],['1.60',53,58,'DPK13 / DPK43',1],['1.55/1.50',43,48,'DPK11L / DPK41L',1]],HP_STD,HX_DYN,'각인 11mm / 14mm 누진대');
+hoya('다이나믹 KR','다이나믹 써미트 KR',P,[['1.67',58,63,'DK15 / DK45',1],['1.60',48,53,'DK13 / DK43',1],['1.55/1.50',38,43,'DK11L / DK41L',1]],HP_STD,HX_DYN,'각인 11mm / 14mm 누진대');
+const HX_AMP='기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정 +4만원';
+hoya('앰플리튜드','앰플리튜드 플러스',P,[['1.67',50,55,'APP15 / APP45',1],['1.60',40,45,'APP13 / APP43',1],['1.55/1.50',30,35,'APP11L / APP41L',1]],HP_STD,HX_AMP,'각인 11mm / 14mm 누진대 · (-)마크 없음');
+hoya('앰플리튜드','앰플리튜드 맥스',P,[['1.67',45,50,'APX15 / APX45',1],['1.60',35,40,'APX13 / APX43',1],['1.55/1.50',25,30,'APX11L / APX41L',1]],HP_STD,HX_AMP,'각인 11mm / 14mm 누진대');
+hoya('앰플리튜드','앰플리튜드 클래식',P,[['1.67',39,44,'APC15 / APC45',1],['1.60',29,34,'APC13 / APC43',1],['1.55/1.50',19,24,'APC11L / APC41L',1]],HP_STD,HX_AMP,'각인 11mm / 14mm 누진대');
+// 스텔리파이 콤피 (누진)
+[['1.60',[25,27,28],'SS3D / SF3D'],['1.50',[18,20,21],'SS1D / SF1D']].forEach(([idx,p,mark])=>{
+  [['VP (발수)',0],['VPB (블루라이트 차단)',1],['SFT (내구성 강화)',2]].forEach(([c,i])=>add({co:'HOYA',brand:'스텔리파이',prod:'스텔리파이 콤피',focus:P,idx,coat:c,price:p[i],mark,extra:'기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정·생산범위 외 +4만원 · 변색(센서티·썬프로) 불가',note:'첫 착용자용 스탠다드 누진 · 각인 11mm / 15mm'}));
+});
+const HX_VIS='기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정·1.50~1.74 -4.00 난시 초과 +4만원';
+hoya('비쥬프로','비쥬프로 인디비주얼',P,[['1.74',80,null,'E◆i7',0],['1.67',65,70,'E◆i5',1],['1.60',55,60,'E◆i3',1],['1.55/1.50',45,50,'E◆i1L',1]],HP_STD,HX_VIS,'3045 전용 · ◆ 올데이(1)·플렉스(2) · 올데이 타입1/3/5, 플렉스 타입1~4');
+hoya('비쥬프로','비쥬프로',P,[['1.74',73,null,'E◆7',0],['1.67',55,60,'E◆5',1],['1.60',45,50,'E◆3',1],['1.55/1.50',35,40,'E◆1L',1]],HP_STD,HX_VIS,'3045 전용 · ◆ 올데이(1)·플렉스(2)');
+// 사무용
+const OF='사무용', HX_OF='기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정 +4만원';
+hoya('워크스타일 (사무용)','워크스타일3',OF,[['1.67',73,78,'WS35',0],['1.60',63,68,'WS33',0],['1.55/1.50',53,58,'WS31L',0]],null,HX_OF,'중-근용 · 스페이스(6M)·스크린(2M)·클로즈(1M) · 가입도 +0.75~+3.50');
+hoya('워크스타일 (사무용)','워크스타일 비즈니스',OF,[['1.67',60,65,'WSB5',0],['1.60',50,55,'WSB3',0],['1.55/1.50',40,45,'WSB1L',0]],null,HX_OF,'중-근용 · 400(4M)·200(2M) 양면복합설계');
+hoya('워크스타일 (사무용)','워크스마트 룸',OF,[['1.60',38,43,'DT3',0],['1.55/1.50',28,33,'DT1L',0]],null,HX_OF,'중-근용 내면설계 · 4M·2M');
+hoya('워크스타일 (사무용)','슈퍼리더 B',OF,[['1.60',28,33,'DL3',0],['1.55/1.50',23,28,'DL1L',0]],null,HX_OF,'근-근용 · 120cm');
+hoya('워크스타일 (사무용)','슈퍼리더 A',OF,[['1.60',23,28,'DL3',0],['1.55/1.50',18,23,'DL1L',0]],null,HX_OF,'근-근용 · 60cm');
+add({co:'HOYA',brand:'워크스타일 (사무용)',prod:'애드파워',focus:OF,idx:'1.50',coat:'AQUA',price:8,mark:'AP1',extra:HX_OF,note:'근-근용 · 60cm'});
+// 단초점
+const SV='단초점', HX_SV='기본 사양: METS / 착색 +5만원 / 프리즘 +15만원 / 외경지정 +4만원';
+hoya('싱크3','싱크3 프로',SV,[['1.74',75,null,'SYi7',0],['1.67',60,65,'SYi5',1],['1.60',50,55,'SYi3',1],['1.55/1.50',40,45,'SYi1L',1]],HP_STD,HX_SV,'눈 피로완화 디지털 렌즈 · A타입(5)·B타입(9)·D타입(13)');
+hoya('싱크3','싱크3 스탠다드',SV,[['1.74',68,null,'SY7',0],['1.67',50,55,'SY5',1],['1.60',40,45,'SY3',1],['1.55/1.50',30,35,'SY1L',1]],HP_STD,HX_SV,'눈 피로완화 디지털 렌즈');
+hoya('뉴럭스','뉴럭스 V+',SV,[['1.74',83,null,'Ni7',0],['1.67',63,68,'Ni5',1],['1.60',53,58,'Ni3',1],['1.55/1.50',43,48,'Ni1L',0]],HP_STD,'기본 사양: METS / 착색 +5만원 / 프리즘 +15만원','개인맞춤형 단초점 비구면 · 각인 코쪽');
+hoya('뉴럭스','뉴럭스 EP',SV,[['1.74',73,null,'(-)',0],['1.67',53,58,'(-)',1],['1.60',43,48,'(-)',1]],HP_STD,'METS +4만원 / 착색 +5만원 / 프리즘 +15만원','단초점 양면 비구면');
+hoya('뉴럭스','뉴럭스',SV,[['1.74',58,null,'(-)',0],['1.67',36,41,'(-)',1],['1.60',26,31,'(-)',1],['1.55/1.50',20,25,'(-)',1]],HP_STD,'METS +2만원 / 착색 +5만원 / 프리즘 +15만원','단초점 비구면 · 일부 제품 마크 없음');
+const HX_HL='METS +2만원 / 커브(6C,8C) +17만원 / 커브 METS +4만원 / 커브 센서티3 +37만원 / 착색 +5만원 / 프리즘 +15만원';
+hoya('하이럭스','하이럭스',SV,[['1.60',21,26,'(-)',1]],HP_STD,HX_HL,'단초점 구면');
+[['센서티3 (썬프로)',42],['센서티3 (메이리오)',37],['센서티 컬러 (썬프로·반미러)',37],['센서티2·다크·샤인·패스트',32]].forEach(([n,p])=>add({co:'HOYA',brand:'하이럭스',prod:'하이럭스',focus:SV,idx:'1.50',coat:n.includes('썬프로')?'썬프로':'메이리오',photo:n,price:p,mark:'(-)',extra:HX_HL,note:'단초점 구면 · 1.50은 변색 단가(클리어 없음)'}));
+// 여벌
+const Y='여벌';
+[['뉴럭스','뉴럭스 EP 여벌','1.67',null,30],['뉴럭스','뉴럭스 EP 여벌','1.60',26,23],['뉴럭스','뉴럭스 여벌','1.74',43,40],['뉴럭스','뉴럭스 여벌','1.67',23,20],['뉴럭스','뉴럭스 여벌','1.60',16,13],['뉴럭스','뉴럭스 여벌','1.55',11,9],['하이럭스','하이럭스 여벌','1.60',null,10]].forEach(([b,p,idx,full,uv])=>{
+  if(full!=null) add({co:'HOYA',brand:b,prod:p,focus:SV,idx,sup:Y,coat:'풀컨트롤',price:full,note:'여벌 클리어 · 자외선 차단·내구성·정전기 방지·SIAA 항균·블루라이트 차단'});
+  add({co:'HOYA',brand:b,prod:p,focus:SV,idx,sup:Y,coat:'울트라브이',price:uv,note:'여벌 클리어 · 자외선 차단·내구성·정전기 방지'});
+});
+[['뉴럭스','뉴럭스 센서티2 여벌','1.67','VG-UV',34],['뉴럭스','뉴럭스 센서티2 여벌','1.60','VG-UV',30],['뉴럭스','뉴럭스 센서티2 여벌','1.55','VP',20],['하이럭스','하이럭스 센서티2 여벌','1.60','VG-UV',20],['하이럭스','하이럭스 센서티2 여벌','1.50','VP',15]].forEach(([b,p,idx,c,pr])=>add({co:'HOYA',brand:b,prod:p,focus:SV,idx,sup:Y,coat:c,photo:'센서티2 (그레이·브라운·그린)',price:pr,note:'여벌 변색'}));
+const ST_N='스텔리파이 시리즈는 (-)마크 없음';
+[['스텔리파이 듀얼 세이프 여벌','1.67','비구면 · VHV',15,'SDS5'],['스텔리파이 듀얼 세이프 여벌','1.60','구면 · VHV',10,'SDS3'],['스텔리파이 스탠다드 여벌','1.67','비구면 · VP',15,'SA5'],['스텔리파이 스탠다드 여벌','1.60','비구면 · VP',10,'SA3'],['스텔리파이 스탠다드 여벌','1.55','비구면 · VP',6.5,'SA2'],['스텔리파이 스탠다드 여벌','1.60','구면 · VP',7.5,'SL3'],['스텔리파이 스탠다드 여벌','1.55','구면 · VP',5,'SL']].forEach(([p,idx,c,pr,m])=>add({co:'HOYA',brand:'스텔리파이',prod:p,focus:SV,idx,sup:Y,coat:c,price:pr,mark:m,note:ST_N}));
+add({co:'HOYA',brand:'스텔리파이',prod:'스텔리파이 스탠다드 여벌',focus:SV,idx:'1.55',sup:Y,coat:'구면 · VP',photo:'솔리오2 (그레이·브라운)',price:12,mark:'SL',note:ST_N});
+const HX_STR='METS +2만원 / 착색 +5만원 / 프리즘 +10만원 / 외경지정·생산범위 외 +4만원 · 내면멀티코팅: VP 적용 가능(SGY,SBR,SGB,SBL,SYL)';
+[['1.60','비구면',18,20,'SA3'],['1.55','비구면',13,15,'SA2'],['1.60','구면',15,17,'SL3'],['1.55','구면',11,13,'SL']].forEach(([idx,t,vp,vpb,m])=>{
+  add({co:'HOYA',brand:'스텔리파이',prod:'스텔리파이 단초점 RX ('+t+')',focus:SV,idx,coat:'VP (발수)',price:vp,mark:m,extra:HX_STR,note:ST_N+' · 프레임 가공 미제공'});
+  add({co:'HOYA',brand:'스텔리파이',prod:'스텔리파이 단초점 RX ('+t+')',focus:SV,idx,coat:'VPB (블루라이트 차단)',price:vpb,mark:m,extra:HX_STR,note:ST_N+' · 프레임 가공 미제공'});
+});
+add({co:'HOYA',brand:'스텔리파이',prod:'스텔리파이 단초점 RX (구면)',focus:SV,idx:'1.55',coat:'VP (발수)',photo:'솔리오2 (G/B)',price:21,mark:'SL',extra:HX_STR,note:ST_N});
+// 언루트 (운전)
+[['언루트 프로',P,'1.67',80,'RP55V'],['언루트 프로',P,'1.60',70,'RP53V'],['언루트 프로',SV,'1.67',48,'(-)'],['언루트 프로',SV,'1.60',38,'(-)'],['언루트 스탠다드',P,'1.67',70,'R55V'],['언루트 스탠다드',P,'1.60',60,'R53V'],['언루트 스탠다드',SV,'1.67',45,'(-)'],['언루트 스탠다드',SV,'1.60',35,'(-)']].forEach(([p,f,idx,pr,m])=>add({co:'HOYA',brand:'언루트 (운전)',prod:p+(f===P?' 누진':' 단초점'),focus:f,idx,coat:'DRV-VG',price:pr,mark:m,extra:'METS 기본 / 착색 불가 / 프리즘 +15만원',note:'드라이빙 전용 · 누진대 15mm'+(p==='언루트 프로'?' · 프로는 1조 주문만 가능':'')}));
+
+/* ---------------- ESSILOR ---------------- */
+add({co:'ESSILOR',brand:'스텔리스트',prod:'에실로 스텔리스트',focus:'근시억제',idx:'1.59',coat:'Crizal Rock',price:52,mark:'',range:'구면 0.00~-12.00D / 난시 0.00~-4.00D / 합도수 -12.00까지',extra:'프리즘 단안 2△',note:'식약처 임상자료 심사 완료 · 폴리카보네이트(PC) · 매일 12시간 착용 시 근시진행 67% 억제(임상) · 8~13세'});
+add({co:'ESSILOR',brand:'스텔리스트',prod:'스텔리스트 프리벤시아',focus:'근시억제',idx:'1.59',coat:'Crizal Prevencia',price:57,mark:'',range:'구면 0.00~-12.00D / 난시 0.00~-4.00D · 직경 70(~-9.00)/65/60/55(~-12.00)',extra:'착색 +3만원(태국 생산 적용 불가) / 프리즘 +10만원 · 태국 주문 납기 10~11일',note:'Airwear PC · 블루바이올렛 차단'});
+function ess(brand,prod,focus,items,opt,extra,note){
+  // items: [idx, price, mark, {noXtr, sup}]
+  items.forEach(([idx,pr,mark,f={}])=>{
+    const sup=f.sup||'RX';
+    add({co:'ESSILOR',brand,prod,focus,idx,sup,coat:f.coat||(sup==='여벌'?'-':'Crizal Rock'),price:pr,mark,extra,note});
+    if(sup!=='RX') return;
+    add({co:'ESSILOR',brand,prod,focus,idx,coat:'Crizal Sapphire HR',price:pr+5,mark,extra,note:(note?note+' · ':'')+'코팅 옵션 +5만원 포함'});
+    add({co:'ESSILOR',brand,prod,focus,idx,coat:'BlueUV Capture',price:pr+5,mark:mark+' (BIU 음각)',extra,note:(note?note+' · ':'')+'블루라이트 필터링 +5만원 포함'});
+    add({co:'ESSILOR',brand,prod,focus,idx,coat:'Crizal Rock',photo:'트랜지션스 Gen S',price:pr+17,mark,extra,note:(note?note+' · ':'')+'변색 +17만원 포함 · '+(opt.gensColor||'기본컬러+스타일컬러')});
+    if(opt.xtr&&!f.noXtr) add({co:'ESSILOR',brand,prod,focus,idx,coat:'Crizal Rock',photo:'트랜지션스 XTRActive',price:pr+20,mark,extra,note:(note?note+' · ':'')+'변색 +20만원 포함 · 변색편광은 +5만원 추가'});
+  });
+}
+ess('아이젠','아이젠 스타트',SV,[['1.60',19,'E6',{sup:'여벌'}],['1.56',14,'Eλ',{sup:'여벌'}],['1.74',60,'Ⓔ74/F',{noXtr:1}],['1.67',40,'Ⓔπ/F'],['1.60',30,'Ⓔ6/F'],['1.50',25,'Ⓔ5/F']],{xtr:1},'아이코드 +10만원 / 착색 RX +3만원(수입주문 불가) / 프리즘 +10만원 · 수입 주문 납기 6~7일 · BlueUV·변색 추가 시 기본 코팅 Crizal Rock','원·근거리 선명 · 눈 피로 감소 단초점 (DualOptim) · 전 연령');
+ess('아이젠','아이젠 부스트',SV,[['1.74',65,'74/F',{noXtr:1}],['1.67',45,'π/F'],['1.60',35,'6/F'],['1.50',30,'5/F']],{xtr:1},'아이코드 +10만원 / 착색 RX +3만원(수입주문 불가) / 프리즘 +10만원 · 수입 주문 납기 6~7일','높은 시각 피로 기능성 · 도수변화량 0.40/0.60/0.85/1.10D · 18~45세');
+ess('아이젠','아이젠 K',SV,[['1.60',30,'EK6/F'],['1.59',28,'EKP/F',{coat:'Crizal Rock'}],['1.50',25,'EK5/F']],{xtr:0,gensColor:'기본컬러(브라운·그레이·그린)'},'착색 RX +3만원(수입주문 불가) / 프리즘 +10만원 · 아이코드 적용 불가 · 수입 주문 납기 6~7일','어린이 개인맞춤 단초점 · 6~12세 · 1.59 Airwear(PC)');
+// Eyezen spec ranges
+R.forEach(r=>{ if(r.co!=='ESSILOR'||r.brand!=='아이젠') return;
+  const m={ '아이젠 부스트':{'1.74':'+13.00 / -18.00 (-6.00)','1.67':'+9.00 / -12.00 (-6.00)','1.60':'+8.00 / -12.00 (-6.00)','1.50':'+6.00 / -10.00 (-6.00)'},
+            '아이젠 스타트':{'1.74':'+13.00 / -18.00 (-6.00)','1.67':'+9.00 / -12.00 (-6.00)','1.60':r.sup==='여벌'?'+3.00 / -6.00 (-2.00)':'+8.00 / -12.00 (-6.00)','1.56':'+3.00 / -6.00 (-2.00)','1.50':'+6.00 / -10.00 (-6.00)'},
+            '아이젠 K':{'1.60':'+8.00 / -12.00 (-6.00)','1.59':'+6.00 / -10.00 (-6.00)','1.50':'+6.00 / -10.00 (-6.00)'} };
+  r.range=(m[r.prod]||{})[r.idx]||'';
+});
+// Varilux (사양만)
+const VX=[
+ ['바리락스 XR Pro',[['1.74','Crizal Rock','74+4D','+13.00 / -14.00 (-6.00)'],['1.67','SEE+UV','π+4D','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6+4D','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5+4D','+6.00 / -10.00 (-6.00)']],'가입도 0.75~4.00 · 누진대 11~15 (NVB 자동지정)'],
+ ['바리락스 XR Track',[['1.74','Crizal Rock','74+F','+13.00 / -14.00 (-6.00)'],['1.67','SEE+UV','π+F','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6+F','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5+F','+6.00 / -10.00 (-6.00)']],'가입도 0.75~4.00 · 누진대 11~15 (NVB 자동지정)'],
+ ['바리락스 XR Fit',[['1.74','Crizal Rock','74+F','+13.00 / -14.00 (-6.00)'],['1.67','SEE+UV','π+F','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6+F','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5+F','+6.00 / -10.00 (-6.00)']],'가입도 0.75~4.00 · 누진대 11~15 (0.1mm)'],
+ ['바리락스 XR Design',[['1.74','Crizal Rock','S: 74+S / R: 74','+13.00 / -14.00 (-6.00)'],['1.67','SEE+UV','S: π+S / R: π','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','S: 6+S / R: 6','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','S: 5+S / R: 5','+6.00 / -10.00 (-6.00)']],'가입도 R 0.75~4.00 / S 0.75~3.50 · 누진대 11/14'],
+ ['바리락스 피지오 익스텐시 Track',[['1.74','Crizal Rock','74+F','+13.00 / -18.00 (-6.00)'],['1.67','SEE+UV','π+F','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6+F','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5+F','+6.00 / -10.00 (-6.00)']],'가입도 0.75~4.00 · 누진대 11~15 (NVB 자동지정)'],
+ ['바리락스 피지오 익스텐시 Fit',[['1.74','Crizal Rock','74+F','+13.00 / -18.00 (-6.00)'],['1.67','SEE+UV','π+F','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6+F','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5+F','+6.00 / -10.00 (-6.00)']],'가입도 0.75~4.00 · 누진대 11~15 (0.1mm)'],
+ ['바리락스 피지오 익스텐시 KAN',[['1.74','Crizal Rock','74 S/R 한자','+13.00 / -18.00 (-6.00)'],['1.67','SEE+UV','π S/R 한자','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6 S/R 한자','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5 S/R 한자','+6.00 / -10.00 (-6.00)']],'가입도 R 0.75~4.00 / S 0.75~3.00 · 누진대 11/14'],
+ ['바리락스 피지오 익스텐시',[['1.74','Crizal Rock','S: 74+S / R: 74','+13.00 / -18.00 (-6.00)'],['1.67','SEE+UV','S: π+S / R: π','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','S: 6+S / R: 6','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','S: 5+S / R: 5','+6.00 / -10.00 (-6.00)']],'가입도 R 0.75~4.00 / S 0.75~3.00 · 누진대 11/14'],
+ ['바리락스 컴포트 맥스 Fit',[['1.67','SEE+UV','π F','+7.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6 F','+7.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5 F','+7.00 / -10.00 (-6.00)']],'가입도 0.75~3.50 · 누진대 11~14'],
+ ['바리락스 컴포트 맥스 KAN',[['1.67','SEE+UV','π S/R 한자','+7.00 / -12.00 (-6.00)'],['1.60','SEE+UV','6 S/R 한자','+7.00 / -12.00 (-6.00)'],['1.50','SEE+UV','5 S/R 한자','+7.00 / -10.00 (-6.00)']],'가입도 R 0.75~3.50 / S 0.75~3.00 · 누진대 11/14'],
+ ['바리락스 컴포트 맥스',[['1.67','SEE+UV','S: π S / R: π','+7.00 / -12.00 (-6.00)'],['1.60','SEE+UV','S: 6 S / R: 6','+7.00 / -12.00 (-6.00)'],['1.50','SEE+UV','S: 5 S / R: 5','+7.00 / -10.00 (-6.00)']],'가입도 R 0.75~3.50 / S 0.75~3.00 · 누진대 11/14'],
+ ['바리락스 리버티 3.0 Fit',[['1.67','ECC','π F','+6.00 / -10.00 (-6.00)'],['1.60','ECC','6 F','+6.00 / -10.00 (-6.00)'],['1.50','ECC','F','+6.00 / -8.00 (-6.00)']],'가입도 0.75~3.50 · 누진대 11~14'],
+ ['바리락스 리버티 3.0',[['1.67','ECC','π','+6.00 / -10.00 (-6.00)'],['1.60','ECC','6','+6.00 / -10.00 (-6.00)'],['1.50','ECC','(숫자 없음)','+6.00 / -8.00 (-6.00)']],'가입도 R 0.75~3.50 / S 0.75~3.00 · 누진대 11/14'],
+ ['바리락스 리버티 클래식',[['1.60','ECC','C/6','+6.00 / -10.00 (-6.00)'],['1.50','ECC','C/','+6.00 / -8.00 (-6.00)']],'가입도 R 0.75~3.50 / S 0.75~3.00 · 누진대 11/14'],
+ ['바리락스 디지타임 Fit',[['1.67','SEE+UV','F / Near·Mid·Room π','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','F / Near·Mid·Room 6','+8.00 / -10.00 (-6.00)'],['1.50','SEE+UV','F / Near·Mid·Room','+6.00 / -8.00 (-6.00)']],'사무용 · 가입도 0.75~3.50'],
+ ['바리락스 디지타임',[['1.67','SEE+UV','Near·Mid·Room π','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','Near·Mid·Room 6','+8.00 / -10.00 (-6.00)'],['1.50','SEE+UV','Near·Mid·Room','+6.00 / -8.00 (-6.00)']],'사무용 · 가입도 0.75~3.50'],
+ ['디지맥스 Fit',[['1.67','SEE+UV','F / DM π','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','F / DM 6','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','F / DM 5','+7.00 / -10.00 (-6.00)']],'도수변화량 0.50~1.75 · Screen Vision Zone 14~18mm'],
+ ['디지맥스',[['1.67','SEE+UV','DM π','+9.00 / -12.00 (-6.00)'],['1.60','SEE+UV','DM 6','+8.00 / -12.00 (-6.00)'],['1.50','SEE+UV','DM 5','+7.00 / -10.00 (-6.00)']],'도수변화량 0.50~1.75 · Screen Vision Zone 15/17mm'],
+];
+VX.forEach(([p,rows,n])=>rows.forEach(([idx,c,m,rg])=>{
+  const f=/디지타임/.test(p)?'사무용':(/디지맥스/.test(p)?SV:P);
+  add({co:'ESSILOR',brand:/디지맥스/.test(p)?'디지맥스':'바리락스',prod:p,focus:f,idx,coat:c,mark:m,range:rg,note:n+' · 가격표 미포함(사양만)'});
+}));
+
+/* ---------------- NIKON (사양만) ---------------- */
+const NK4=[['씨맥스 얼티밋 Z','SULZ'],['씨맥스 마스터 Z','SMAZ'],['프레지오 파워 Z','PPZ'],['프레지오 와이드 Z','WZ'],['프레지오 어드밴스 Z','ADZ']];
+const NKR={'1.74':'+10.00 / -16.00 (-6.00)','1.67':'+9.00 / -14.00 (-6.00)','1.60':'+8.00 / -12.00 (-6.00)','1.50':'+5.50 / -10.00 (-6.00)'};
+const NKN={'1.74':'N5','1.67':'N4','1.60':'N3','1.50':'N1'};
+NK4.forEach(([p,c])=>['1.74','1.67','1.60','1.50'].forEach(i=>add({co:'NIKON',brand:'니콘 누진',prod:p,focus:P,idx:i,coat:'SEE+UV',mark:`${c}/${NKN[i]} 0 · 2 · 4`,range:NKR[i],note:'가입도 0.50~4.00 · 누진대 10/12/14mm (각인 끝자리 0/2/4) · 가격표 미포함(사양만)'})));
+[['LOHAS 액티브','',P,'10/12/14mm','0 · 2 · 4'],['프레지오 무브 INF','M',P,'10/12/14mm','0 · 2 · 4'],['프레지오 퍼스트','PF',P,'10/12/14mm','0 · 2 · 4'],['프레지오 엔트리','PE',P,'10/12/14mm','0 · 2 · 4']].forEach(([p,c])=>['1.67','1.60','1.50'].forEach(i=>{
+  const coat=/LOHAS/.test(p)?'SEE+UV':'ECC';
+  const mk=/LOHAS/.test(p)?`LOHAS/${NKN[i]}0 · ${NKN[i]}2 · ${NKN[i]}4`:(c==='M'?`M/${NKN[i]} 0 · 2 · 4`:`${c}/Π${NKN[i].slice(1)}0 · 2 · 4`);
+  add({co:'NIKON',brand:'니콘 누진',prod:p,focus:P,idx:i,coat,mark:mk,range:NKR[i],note:'가입도 0.50~4.00 · 누진대 10/12/14mm · 가격표 미포함(사양만)'});
+}));
+[['LOHAS 워크','W'],['LOHAS 홈','H'],['LOHAS 리딩','R']].forEach(([p,s])=>['1.67','1.60','1.50'].forEach(i=>add({co:'NIKON',brand:'니콘 누진',prod:p,focus:'사무용',idx:i,coat:'SEE+UV',mark:`LOHAS/${NKN[i]}0${s} (20mm) · ${NKN[i]}2${s} (22mm)`,range:i==='1.50'?'+5.00 / -7.00 (-6.00)':'+5.00 / -10.00 (-6.00)',note:'가입도 0.50~4.00 · 누진대 20/22mm · 가격표 미포함(사양만)'})));
+[['1.74','+8.00 / -16.00 (-6.00)'],['1.67','+8.00 / -13.00 (-6.00)'],['1.60','+8.00 / -12.00 (-6.00)'],['1.50','+5.50 / -11.00 (-6.00)']].forEach(([i,rg])=>add({co:'NIKON',brand:'니콘 누진',prod:'홈 & 오피스 PRO',focus:'사무용',idx:i,coat:'ECC',mark:`1M:H1/${NKN[i]} · 2M:H2/${NKN[i]} · 3M:H3/${NKN[i]}`,range:rg,note:'가입도 0.75~4.00 · 누진대 20/22mm · 가격표 미포함(사양만)'}));
+[['1.74','+8.00 / -12.00 (-6.00)'],['1.67','+8.00 / -11.00 (-6.00)'],['1.60','+8.00 / -10.00 (-6.00)'],['1.50','+6.00 / -9.00 (-6.00)']].forEach(([i,rg])=>add({co:'NIKON',brand:'니콘 누진',prod:'솔테스 와이드 PRO',focus:'사무용',idx:i,coat:'ECC',mark:`RD/${NKN[i]}`,range:rg,note:'타입 1/2/3/4 · 가격표 미포함(사양만)'}));
+[['1.67','+7.00 / -8.00 (-6.00)'],['1.60','+7.00 / -7.00 (-6.00)'],['1.50','+6.00 / -5.00 (-6.00)']].forEach(([i,rg])=>add({co:'NIKON',brand:'니콘 누진',prod:'솔테스 와이드 네오',focus:'사무용',idx:i,coat:'ECC',mark:`SW/${NKN[i]}`,range:rg,note:'타입 1/2/3/4 · 근용 합도수 기준 · 가격표 미포함(사양만)'}));
+const NK5=[
+ ['씨맥스 INF','',[['1.74','+10.00 / -16.00 (-6.00)','ⁿ5'],['1.67','+9.00 / -12.00 (-6.00)','ⁿ4'],['1.60','+8.00 / -10.00 (-6.00)','ⁿ3'],['1.50','+6.00 / -7.00 (-6.00)','ⁿ1']]],
+ ['씨맥스 AP','',[['1.74','+10.00 / -18.00 (-6.00)','Ⓒ5'],['1.67','+8.00 / -12.00 (-6.00)','Ⓒ4'],['1.60','+8.00 / -10.00 (-6.00)','Ⓒ3']]],
+ ['라이트 뷰핏','',[['1.67','+9.00 / -13.00 (-6.00)','∩4'],['1.60','+8.00 / -12.00 (-6.00)','∩3'],['1.50','+5.50 / -10.00 (-6.00)','∩1']]],
+ ['양면비구면 DAS','',[['1.74','여벌 -3.00/-10.00(-2.00) · RX +10.00/-18.00(-4.00)','ᴅ5'],['1.67','여벌 -3.00/-8.00(-2.00) · RX +8.00/-12.00(-4.00)','ᴅ4'],['1.60','여벌 +0.00/-6.00(-2.00) · RX +8.00/-10.00(-4.00)','ᴅ3']]],
+ ['비구면 단초점 BLUV','여벌',[['1.67','-3.00 / -10.00 (-2.00)','N4 (물결)'],['1.60','+6.00(-2.00) / -8.00(-3.00), -8.25~-10.00 난시없음','N3 (물결)'],['1.56','+4.00 / -4.00 (-2.00)','N2 (물결)']]],
+ ['니콘 라이트 비구면','',[['1.67','RX +8.00 / -16.00 (-6.00)','N4'],['1.60','ECC여벌 +6.00/-8.00(-2.00) · RX +6.00/-13.00(-6.00)','N3'],['1.56','ECC여벌 +4.00/-4.00(-2.00) · RX +6.00/-10.00(-6.00)','N2']]],
+ ['니콘 라이트 구면','',[['1.60','RX +6.00 / -13.00 (-6.00)','∩3'],['1.56','RX +6.00 / -10.00 (-6.00)','∩2']]],
+ ['릴렉씨 네오 플러스 (0.75~1.75)','',[['1.74','+10.00 / -16.00 (-6.00)','B neo/N5'],['1.67','+8.00 / -16.00 (-6.00)','B neo/N4'],['1.60','+8.00 / -12.00 (-6.00)','B neo/N3']]],
+ ['릴렉씨 네오 (0.75~1.75)','',[['1.74','+6.00 / -16.00 (-6.00)','neo/N5'],['1.67','+6.00 / -12.00 (-6.00)','neo/N4'],['1.60','+6.00 / -10.00 (-6.00)','neo/N3'],['1.50','+6.00 / -10.00 (-6.00)','neo/N1']]],
+ ['BLUV PLUS (0.50~1.75)','',[['1.67','+6.00 / -12.00 (-6.00)','BP/N4'],['1.60','+6.00 / -10.00 (-6.00)','BP/N3'],['1.56','+5.00 / -8.00 (-6.00)','BP/N2']]],
+];
+NK5.forEach(([p,sup,rows])=>rows.forEach(([i,rg,m])=>add({co:'NIKON',brand:'니콘 단초점',prod:p,focus:SV,idx:i,sup:sup||(/여벌/.test(rg)&&!/RX/.test(rg)?'여벌':'RX'),coat:'',mark:m,range:rg,note:'각인은 근사 표기 · 가격표 미포함(사양만)'})));
+[['변색 비구면 트랜지션스 GEN S',[['1.74','RX','+10.00 / -16.00 (-6.00)','N5'],['1.67','RX','+8.00 / -12.00 (-6.00)','N4'],['1.60','여벌','+3.00 / -6.00 (-2.00)','N3'],['1.56','여벌','+3.00/-5.00(-2.00), -5.25~-6.00 난시없음','N2']]],
+ ['변색 구면 트랜지션스 GEN S',[['1.60','RX','+6.00 / -13.00 (-6.00)','∩3'],['1.50','RX','+4.00 / -8.00 (-6.00)','Nk']]],
+ ['변색 구면 트랜지션스 XTRActive',[['1.60','RX','+8.00 / -12.00 (-6.00)','∩3'],['1.50','RX','+8.00 / -10.00 (-6.00)','Nk']]],
+ ['변색 비구면 트랜지션스 클래식',[['1.60','여벌','+3.00 / -6.00 (-2.00)','N3C'],['1.56','여벌','+3.00/-5.00(-2.00), -5.25~-6.00 난시없음','N2C']]]].forEach(([p,rows])=>rows.forEach(([i,s,rg,m])=>add({co:'NIKON',brand:'니콘 단초점',prod:p,focus:SV,idx:i,sup:s,photo:/XTRActive/.test(p)?'트랜지션스 XTRActive':(/클래식/.test(p)?'트랜지션스 클래식':'트랜지션스 Gen S'),mark:m,range:rg,note:'각인은 근사 표기 · 가격표 미포함(사양만)'})));
+
+/* ---------------- 웹 조사 각인 (2026-09 조사, 참고용) ---------------- */
+function W(o){add(Object.assign({sup:'RX'},o));}
+// ZEISS — 코쪽: 제품코드 + 굴절률 2자리 / 귀쪽: 가입도 3자리(225=+2.25)
+const ZI=[['1.50','50'],['1.59','59'],['1.60','60'],['1.67','67'],['1.74','74']];
+const Z_SRC='https://www.2020mag.com/CMSDocuments/2024/03/ZEISS-SmartLife-2.0-Progressive-Fact-Sheet.pdf';
+const Z_FO='https://www.france-optique.com/gravure/axiale/261';
+const Z_RULE='코쪽: 제품코드+굴절률(50/59/60/67/74) · 귀쪽: 가입도 3자리(225=+2.25)·FrameFit 등';
+[['SmartLife 누진 인디비주얼 3','SI3',P,Z_SRC,''],['SmartLife 누진 슈퍼브','SSB',P,Z_SRC,''],['SmartLife 누진 플러스','SPL',P,Z_SRC,''],['SmartLife 누진 퓨어','SPU',P,Z_SRC,' 14/18'],
+ ['SmartLife 누진 인디비주얼 (이전세대)','SIN',P,Z_FO,''],['프로그레시브 인디비주얼 2','I2',P,Z_FO,''],['프리시전 슈퍼브','PS',P,Z_FO,''],['프리시전 플러스','PL',P,Z_FO,''],['프리시전 퓨어','PU',P,Z_FO,' 14/18'],
+ ['라이트 3D','L3D',P,Z_FO,' 14/18'],['라이트 D','LD',P,Z_FO,' 14/18'],['오피스렌즈 인디비주얼','OI','사무용',Z_FO,''],['오피스렌즈 플러스','OP','사무용',Z_FO,''],
+ ['SmartLife 단초점 인디비주얼 3','VI3',SV,Z_SRC,''],['SmartLife 디지털 인디비주얼 3','DI3',SV,Z_SRC,''],['SmartLife 단초점','SL',SV,Z_FO,''],['SmartLife 영','SY',SV,Z_FO,''],['단초점 인디비주얼','VI',SV,Z_FO,''],['단초점 슈퍼브','VS',SV,Z_FO,''],['클리어뷰','CV',SV,Z_FO,'']
+].forEach(([p,c,f,src,suf])=>ZI.forEach(([i,n])=>W({co:'ZEISS',brand:'자이스',prod:'자이스 '+p,focus:f,idx:i,mark:c+n+suf,note:Z_RULE+(suf?' · 14/18 = 누진대(피팅높이)':''),ref:'참고 · 제조사/각인DB',src})));
+W({co:'ZEISS',brand:'자이스',prod:'자이스 SmartLife 프로 누진',focus:P,idx:'',mark:'',note:'각인 코드 미확인',ref:'참고 · 미확인',src:''});
+// RODENSTOCK — 한쪽: R + 디자인기호 + 가입도 2자리 + 주문코드 3자 / 반대쪽: 베이스커브+굴절률(65 60)
+const RD_SRC='https://www.rodenstock.com/fallback/dam/jcr:0c9cda81-d231-4413-93b4-eba96e371b33/tips_and_technology_2022_en.pdf';
+[['1.50','50'],['1.60','60'],['1.67','67'],['1.74','74']].forEach(([i,n])=>{
+  [['임프레션 B.I.G. EXACT','R ∞'],['멀티그레시브 B.I.G. EXACT','R ○'],['프로그레시브 B.I.G. EXACT','R ○(점선)']].forEach(([p,s])=>W({co:'RODENSTOCK',brand:'로덴스톡',prod:'로덴스톡 '+p,focus:P,idx:i,mark:`${s} · 가입도(20=2.00) · 주문코드 | 베이스 ${n}`,note:'귀쪽(추정): R 로고+디자인기호+가입도 2자리+주문코드 앞 3자 · 코쪽: 베이스커브+굴절률(예 65 60) · 디자인기호는 구세대 기준(∞=임프레션, ○=멀티그레시브, 점선○=프로그레시브), 신세대 기호는 일부 미확인 · 코너 문자 L/M/X = 누진대',ref:'참고 · 제조사 기술자료 2022',src:RD_SRC}));
+  W({co:'RODENSTOCK',brand:'로덴스톡',prod:'로덴스톡 임프레션·멀티그레시브 B.I.G. Mono',focus:SV,idx:i,mark:`R · 주문코드 | 베이스 ${n}`,note:'단초점 · R 로고 + 주문코드(예 IAE) · 구형 Mono 2는 R∞2 / R○2',ref:'참고 · 제조사 기술자료 2022',src:RD_SRC});
+});
+W({co:'RODENSTOCK',brand:'로덴스톡',prod:'로덴스톡 임프레션',focus:P,idx:'1.60',mark:'R ∞',note:'권장가 1.50 52만원 / 1.60 62만원 / 1.67 72만원 — 작성일 불명 기사, 구세대 가능성(가격 결과에는 미반영)',ref:'참고 · 구가격 기사',src:'http://www.opticnews.co.kr/news/articleView.html?idxno=23898'});
+// SHAMIR — 귀쪽: S로고+가입도 3자리 / 코쪽: 소재코드(위)+디자인코드(아래)
+const SH_SRC='https://shamir.com/wp-content/uploads/2021/09/SHA-REF-MAR-092921.pdf';
+const SHI=[['1.50','15'],['1.56','56'],['1.59','PC'],['1.60','16'],['1.67','67'],['1.74','74']];
+const SH_RULE='귀쪽: S로고+가입도 3자리(250=+2.50) · 코쪽: 소재코드(15/TX/56/PC/16/67/74) 위, 디자인코드 아래 · 변색은 TR/T6/T67/T74';
+[['오토그래프 인텔리전스','AI11·AI13·AI15·AI18 (AI=가변)',P],['오토그래프 III','A311·A313·A315·A318',P],['오토그래프 II+','A2+',P],['인터치','I15·I18',P],['스펙트럼+','SP+14·SP+16·SP+18',P],['엘리먼트','ES(16mm)·E(19mm)',P],['퍼스트PAL','FP',P],['제네시스 HD','GHD',P],['컴퓨터 / 워크스페이스 / 오피스','FFC·FFW·FFO','사무용'],
+ ['오토그래프 III 단초점','SV>> | III',SV],['오토그래프 II 단초점','SV>> | FF',SV],['스펙트럼 단초점','SV | FF',SV],['릴랙스','RLX5·RLX·RLX8 (50/65/80)',SV]
+].forEach(([p,d,f])=>SHI.forEach(([i,m])=>W({co:'SHAMIR',brand:'샤미르',prod:'샤미르 '+p,focus:f,idx:i,mark:`${m} · ${d}`,note:SH_RULE+(f===P?' · 디자인코드 숫자 = 누진대(mm)':''),ref:'참고 · 제조사 각인표',src:SH_SRC})));
+// SEIKO — 2012 일본 자료: 디자인코드 2자 + 가입도 2자리(25=2.50) + ◎(1.74) 또는 S(1.60·1.67)
+const SK_SRC='http://www.frame3000.sakura.ne.jp/KAKUSHI.pdf';
+[['슈페리어 P-1','AR25',['1.74','1.67','1.60'],P],['슈퍼 P-1 네오','AS25',['1.74','1.67','1.60'],P],['엠블렘','EM25',['1.74','1.67','1.60'],P],['퍼슈트 CV','CV25',['1.74','1.67','1.60'],P],['시너지','S4',['1.74','1.67','1.60','1.50'],P],['시너지 WD','D4',['1.74','1.67','1.60'],P],['퍼슈트 EV','EV',['1.67','1.60','1.50'],P],['루메스트','RM25',['1.67','1.60'],'사무용'],['인도어 LD','LD25',['1.67','1.60'],'사무용']
+].forEach(([p,m,is,f])=>is.forEach(i=>W({co:'SEIKO',brand:'세이코',prod:'세이코 '+p,focus:f,idx:i,mark:m+' '+(i==='1.74'?'◎':'S'),note:'숫자 25는 가입도 예시(2.50) · ◎=1.74·변색, S=1.60/1.67 클리어 · 현재 국내 라인(브릴리언스·프라임X 등) 각인은 미확인',ref:'참고 · 2012 일본 자료',src:SK_SRC})));
+// TOKAI — 2012 일본 자료(13mm 누진대 기준): 디자인코드 + 굴절률 문자(Z=1.76, 7=1.70, 6=1.60, 5=1.50)
+const TK_SRC='http://www.frame3000.sakura.ne.jp/KAKUSHI.pdf';
+const TKI={Z:'1.76','7':'1.70','6':'1.60','5':'1.50'};
+[['벨루나 레조나스 R','BS',['Z','7','6'],P],['벨루나 레조나스','NS',['Z','7','6','5'],P],['벨루나 레조나스 핏','nS',['Z','7','6'],P],['벨루나 그레이스','WS',['Z','7','6'],P],['벨루나 세레노 IS','IS',['7','6','5'],P],['벨루나 레갈리아 S','SB',['7','6'],P],['벨루나 리얼','MB',['7','6'],'사무용']
+].forEach(([p,c,ks,f])=>ks.forEach(k=>W({co:'TOKAI',brand:'도카이',prod:'도카이 '+p,focus:f,idx:TKI[k],mark:c+k,note:'끝 문자 = 굴절률(Z=1.76, 7=1.70, 6=1.60, 5=1.50) · 누진대 길이에 따라 각인 변경 · 현재 국내 라인(레조나스·뉴로셀렉트 등) 각인은 미확인',ref:'참고 · 2012 일본 자료',src:TK_SRC})));
+// KODAK
+W({co:'KODAK',brand:'코닥',prod:'코닥 프리사이즈 / 컨사이즈 (디지털)',focus:P,idx:'',mark:'▷ (디지털판 표시)',note:'반가시 마크 아래 삼각형 = 디지털 버전 · 가입도·굴절률 각인 미확인 · 2026-03부터 케미렌즈 국내 유통',ref:'참고 · 제조사 가이드(미국)',src:'https://info.icarelabs.com/hubfs/Kodak%20Lens%20Progressive%20(Cast%20&%20Digital)%20Dispensing%20Guide.pdf'});
+// 케미렌즈 — 귀쪽 굴절률 문자: C=1.50, M=1.56, H=1.60, S=1.67, U=1.74 / 코쪽 제품+누진대
+const CH_SRC='http://www.opticnews.co.kr/news/articleView.html?idxno=32720';
+const CHI=[['1.50','C'],['1.56','M'],['1.60','H'],['1.67','S'],['1.74','U']];
+CHI.forEach(([i,l])=>W({co:'CHEMI',brand:'케미렌즈',prod:'케미 매직폼 디지털 MF-CD',focus:P,idx:i,mark:`${l} | CD9·CD1·CD3`,note:'귀쪽 굴절률 문자(C/M/H/S/U) · 코쪽 CD+누진대 끝자리(9=9mm, 1=11mm, 3=13mm)',ref:'참고 · 업계지 2019',src:CH_SRC}));
+CHI.forEach(([i,l])=>W({co:'CHEMI',brand:'케미렌즈',prod:'케미 누진 (MF-XT·MF-ST·ZERO·3040·MF-Adapter·MF-ANYONE)',focus:P,idx:i,mark:`${l} | 제품코드`,note:'귀쪽 굴절률 문자는 전 누진 공통 · 제품별 코쪽 코드 미확인 · ZERO/3040/Adapter/ANYONE 10만원대부터(기사)',ref:'참고 · 업계지 2019',src:CH_SRC}));
+[['1.60','H'],['1.67','S'],['1.74','U']].forEach(([i,l])=>{
+  W({co:'CHEMI',brand:'케미렌즈',prod:'케미 퍼펙트UV 비구면',focus:SV,idx:i,mark:`CHEMI ${l} (입김 각인)`,note:'평소 안 보이고 입김을 불면 CHEMI + 굴절률 문자가 보임',ref:'참고 · 기사 2015·사용자 제보',src:'http://www.kmedinfo.co.kr/news/articleView.html?idxno=31799'});
+  W({co:'CHEMI',brand:'케미렌즈',prod:'케미 D-FREE 양면비구면 (구형)',focus:SV,idx:i,mark:{H:'CI',S:'CII',U:'CIII'}[l],note:'레이저 CI/CII/CIII = 1.60/1.67/1.74 · 신형(블루라이트)은 입김 각인 CHEMI+H/S/U',ref:'참고 · 사용자 제보(낮음)',src:'https://www.clien.net/service/board/lecture/14105735'});
+});
+// 대명광학 (다가스)
+const DG_SRC='https://infozib.com/국산-다초점렌즈-가격-정리-차이-다가스-렌즈';
+[['다가스 DX 에센셜',18],['다가스 DX3',24],['다가스 DX5',30],['다가스 DX7',35],['다가스 DX9',43],['다가스 DX10',50],['다가스 HD10',58],['다가스 HD20',68]].forEach(([p,pr])=>W({co:'DAEMYUNG',brand:'대명광학 다가스',prod:p,focus:P,idx:'1.50',price:pr,mark:/DX10/.test(p)?'DX1 (11mm, 커뮤니티)':'',note:'권장가 1.50 기준(2024-07 블로그) · 각인 규칙 미확인 · 호야 계열사지만 호야 각인 규칙과 다름',ref:'참고 · 블로그 가격',src:DG_SRC}));
+W({co:'DAEMYUNG',brand:'대명광학 다가스',prod:'펜탁스 (대명 생산)',focus:P,idx:'',mark:'P (엑시머 레이저)',note:'누진·단초점 공통 이니셜 P',ref:'참고 · 업계지 2019',src:CH_SRC});
+// 한미스위스
+W({co:'HANMI',brand:'한미스위스',prod:'한미 C3 개인맞춤 누진 (갤럭시·이글·스페셜에디션)',focus:P,idx:'',mark:'C3 · OT(귀쪽) · DH=스페셜에디션 드라이브',note:'C3 로고 각인(2010 기사) · OT/DH는 안경사 커뮤니티 답변',ref:'참고 · 커뮤니티(낮음)',src:'https://www.eyeopt.co.kr/xe/pal2/3253932'});
+
+/* 출처연도 */
+const YEAR_BY_SRC={[Z_SRC]:'2024',[Z_FO]:'연도미상',[RD_SRC]:'2022','http://www.opticnews.co.kr/news/articleView.html?idxno=23898':'연도미상',[SH_SRC]:'2021',[SK_SRC]:'2012',[CH_SRC]:'2019','http://www.kmedinfo.co.kr/news/articleView.html?idxno=31799':'2015','https://www.clien.net/service/board/lecture/14105735':'2019',[DG_SRC]:'2024','https://www.eyeopt.co.kr/xe/pal2/3253932':'2010·2026'};
+R.forEach(r=>{
+  if(r.year) return;
+  if(!r.ref){ r.year= r.co==='HOYA'?'2026':'2026'; r.yearNote= r.co==='HOYA'?'호야 컨설팅북 2026':(r.co==='NIKON'||/바리락스|디지맥스/.test(r.brand)?'에실로 Sales & Technical Guide 2026 v1':'에실로 가격표 2026 v1'); return; }
+  r.year=YEAR_BY_SRC[r.src]||'연도미상';
+});
+R.filter(r=>r.co==='SEIKO'||r.co==='TOKAI').forEach(r=>r.year='2012');
+R.filter(r=>r.co==='DAEMYUNG'&&/펜탁스/.test(r.prod)).forEach(r=>r.year='2019');
+
+/* ---------------- UI ---------------- */
+R.forEach((r,i)=>{r.id=i;r.hay=(r.co+' '+r.brand+' '+r.prod+' '+r.focus+' '+r.coat+' '+r.photo+' '+r.note+' '+r.extra+' '+r.sup+' '+(r.ref||'')).toLowerCase();r.mk=normMark(r.mark);});
+function normMark(s){return (s||'').toUpperCase().replace(/[\s\/*◆·()\-]/g,'');}
+const $=id=>document.getElementById(id);
+const CO=[['','전체'],['HOYA','호야'],['ESSILOR','에실로'],['NIKON','니콘'],['ZEISS','자이스'],['RODENSTOCK','로덴스톡'],['SHAMIR','샤미르'],['SEIKO','세이코'],['TOKAI','도카이'],['KODAK','코닥'],['CHEMI','케미렌즈'],['DAEMYUNG','대명광학'],['HANMI','한미스위스']];
+const CONAME=Object.fromEntries(CO);
+const FOCUS=[['','전체'],['단초점','단초점'],['누진다초점','누진다초점'],['사무용','사무용'],['근시억제','근시억제']];
+const IDX=['','1.50','1.55','1.56','1.59','1.60','1.67','1.70','1.74','1.76'];
+const SUP=[['','전체'],['RX','RX'],['여벌','여벌']];
+const st={co:'',focus:'',idx:'',sup:'',open:null};
+function seg(el,items,key){
+  el.innerHTML='';
+  items.forEach(it=>{const [v,l]=Array.isArray(it)?it:[it,it||'전체'];
+    const b=document.createElement('button');b.type='button';b.textContent=l;b.setAttribute('aria-pressed',st[key]===v);
+    b.onclick=()=>{st[key]=v;[...el.children].forEach(c=>c.setAttribute('aria-pressed',c===b));if(key==='co')fillBrand();};
+    el.appendChild(b);});
+}
+seg($('coSeg'),CO,'co');seg($('focusSeg'),FOCUS,'focus');seg($('idxSeg'),IDX,'idx');seg($('supSeg'),SUP,'sup');
+function fillBrand(){
+  const cur=$('brand').value;const names=[...new Set(R.filter(r=>!st.co||r.co===st.co).map(r=>r.brand))];
+  $('brand').innerHTML='<option value="">전체</option>'+names.map(n=>`<option>${n}</option>`).join('');
+  if(names.includes(cur))$('brand').value=cur;
+}
+fillBrand();
+const photos=[...new Set(R.filter(r=>r.photo).map(r=>r.photo))];
+$('photo').innerHTML='<option value="">전체</option><option value="__clear">클리어(변색 없음)</option><option value="__any">변색 전체</option>'+photos.map(p=>`<option>${p}</option>`).join('');
+const coats=[...new Set(R.map(r=>r.coat).filter(c=>c&&c!=='-'))];
+$('coat').innerHTML='<option value="">전체</option>'+coats.map(c=>`<option>${c}</option>`).join('');
+
+function fmtPrice(p){
+  if(p==null) return '<span class="na">가격 미기재</span>';
+  const man=Math.floor(p), chun=Math.round((p-man)*10);
+  const big=chun?`${man}<small>만</small>${chun}<small>천원</small>`:`${man}<small>만원</small>`;
+  return `<span class="pbox"><span class="plabel">소비자가</span><span class="price">${big}</span><span class="won">${(Math.round(p*10000)).toLocaleString('ko-KR')}원</span></span>`;
+}
+const DISCOUNT=0.5; // 할인율 50%
+function bigWon(won){
+  const man=Math.floor(won/10000), rest=won%10000;
+  if(!rest) return `${man}<small>만원</small>`;
+  if(rest%1000===0) return `${man?man+'<small>만</small>':''}${rest/1000}<small>천원</small>`;
+  return `${man?man+'<small>만</small>':''}${rest.toLocaleString('ko-KR')}<small>원</small>`;
+}
+function fmtSale(p){
+  if(p==null) return '<span class="na">—</span>';
+  const won=Math.round(p*10000*(1-DISCOUNT));
+  return `<span class="pbox sale"><span class="plabel">50% 할인가</span><span class="price">${bigWon(won)}</span><span class="won">${won.toLocaleString('ko-KR')}원</span></span>`;
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let F=null; // 검색하기를 누른 시점의 조건
+function snap(){
+  F={q:$('q').value.trim().toLowerCase(), mk:normMark($('mk').value), mkType:$('mkType').value, brand:$('brand').value, ph:$('photo').value, coat:$('coat').value,
+     pmin:parseFloat($('pmin').value), pmax:parseFloat($('pmax').value), priced:$('priced').checked, co:st.co, focus:st.focus, idx:st.idx, sup:st.sup};
+}
+function render(){
+  const tb=$('tb');
+  if(!F){$('count').innerHTML='조건을 고른 뒤 <b style="color:var(--red);font-size:14px">검색하기</b>를 누르세요';
+    tb.innerHTML='<tr><td colspan="9" class="empty">왼쪽에서 회사·렌즈종류·굴절률·변색 등 조건을 선택하고<br><b>검색하기</b>를 누르면 소비자가가 표시됩니다.<br><span style="font-size:12px">(조건 없이 누르면 전체 목록이 나옵니다)</span></td></tr>';return;}
+  const {q,mk,brand,ph,coat,pmin,pmax,priced}=F;
+  let rows=R.filter(r=>{
+    if(F.co&&r.co!==F.co) return false;
+    if(brand&&r.brand!==brand) return false;
+    if(F.focus&&r.focus!==F.focus) return false;
+    if(F.idx&&r.idx!==F.idx) return false;
+    if(F.sup&&r.sup!==F.sup) return false;
+    if(ph==='__clear'&&r.photo) return false;
+    if(ph==='__any'&&!r.photo) return false;
+    if(ph&&ph[0]!=='_'&&r.photo!==ph) return false;
+    if(coat&&r.coat!==coat) return false;
+    if(priced&&!mk&&!F.mkType&&r.price==null) return false;
+    if(!isNaN(pmin)&&(r.price==null||r.price<pmin)) return false;
+    if(!isNaN(pmax)&&(r.price==null||r.price>pmax)) return false;
+    if(mk&&!r.mk.includes(mk)) return false;
+    if(F.mkType==='sv'&&r.focus!=='단초점') return false;
+    if(F.mkType==='multi'&&!(r.focus==='누진다초점'||r.focus==='사무용')) return false;
+    if(F.mkType&&(!r.mark||r.mark==='(-)')) return false;
+    if(q&&!q.split(/\s+/).every(t=>r.hay.includes(t))) return false;
+    return true;});
+  const s=$('sort').value;
+  rows.sort((a,b)=>{
+    if(s==='name') return a.prod.localeCompare(b.prod,'ko')||a.idx.localeCompare(b.idx);
+    if(s==='idx') return b.idx.localeCompare(a.idx)||((a.price??1e9)-(b.price??1e9));
+    const pa=a.price??(s==='price-asc'?1e9:-1), pb=b.price??(s==='price-asc'?1e9:-1);
+    return s==='price-asc'?pa-pb:pb-pa;});
+  const pr=rows.filter(r=>r.price!=null).map(r=>r.price);
+  $('count').innerHTML=`<b>${rows.length}</b>건`+(pr.length?` · ${Math.min(...pr)}~${Math.max(...pr)}만원`:'');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="9" class="empty">조건에 맞는 렌즈가 없습니다. 조건을 하나씩 풀어보세요.</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>{
+    const mkHtml=r.mark?`<span class="mark">${esc(r.mark)}</span>`:'<span class="brand">—</span>';
+    const main=`<tr data-id="${r.id}" class="${st.open===r.id?'open':''}" tabindex="0">
+      <td><div class="co ${r.co}">${CONAME[r.co]||r.co}</div><div class="prod">${esc(r.prod)}</div><div class="brand">${esc(r.brand)}</div></td>
+      <td class="num">${fmtPrice(r.price)}</td><td class="yrcell"><span class="ybox${/^20(2[4-9]|3)/.test(r.year)?'':' old'}" title="참고한 자료의 연도"><span class="ylabel">출처</span>${esc(r.year)}</span></td><td class="num">${fmtSale(r.price)}</td>
+      <td>${r.focus}</td><td class="idx">${r.idx||'—'}</td><td>${r.sup}</td>
+      <td>${r.coat?`<span class="pill sv">${esc(r.coat)}</span>`:''}${r.photo?`<span class="pill ph">변색 · ${esc(r.photo)}</span>`:''}${r.ref?`<span class="pill ref">${esc(r.ref)}</span>`:''}</td>
+      <td>${mkHtml}</td></tr>`;
+    if(st.open!==r.id) return main;
+    const d=[['출처연도',r.year+(r.yearNote?' · '+r.yearNote:'')],['메모',r.note],['도수범위',r.range],['추가비용',r.extra]].filter(x=>x[1]).map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')+(r.src?`<dt>출처</dt><dd><a href="${esc(r.src)}" target="_blank" rel="noopener">${esc(r.src)}</a></dd>`:'');
+    return main+`<tr class="detail"><td colspan="9"><dl class="dl">${d||'<dt>정보</dt><dd>추가 정보 없음</dd>'}</dl></td></tr>`;
+  }).join('');
+}
+$('tb').addEventListener('click',e=>{const tr=e.target.closest('tr[data-id]');if(!tr)return;const id=+tr.dataset.id;st.open=st.open===id?null:id;render();});
+$('tb').addEventListener('keydown',e=>{if(e.key==='Enter'){const tr=e.target.closest('tr[data-id]');if(tr){tr.click();}}});
+$('sort').addEventListener('change',render);
+$('go').onclick=()=>{snap();st.open=null;render();document.querySelector('main').scrollIntoView({behavior:'smooth',block:'start'});};
+['q','mk','pmin','pmax'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click();}));
+$('reset').onclick=()=>{['q','mk','pmin','pmax'].forEach(id=>$(id).value='');['brand','photo','coat','mkType'].forEach(id=>$(id).value='');$('priced').checked=true;
+  st.co=st.focus=st.idx=st.sup='';st.open=null;seg($('coSeg'),CO,'co');seg($('focusSeg'),FOCUS,'focus');seg($('idxSeg'),IDX,'idx');seg($('supSeg'),SUP,'sup');fillBrand();F=null;render();};
+render();
+})();
+</script>
