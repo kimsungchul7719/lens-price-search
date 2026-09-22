@@ -123,7 +123,7 @@ tbody tr:last-child td{border-bottom:0}
 td.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
 .co{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:1px 8px;color:#fff;background:var(--grape)}
 .co.HOYA{background:var(--hoya)} .co.ESSILOR{background:var(--essilor)} .co.NIKON{background:var(--nikon)}
-.co.ZEISS{background:var(--sky)} .co.RODENSTOCK{background:var(--orange)} .co.SHAMIR{background:var(--mint)} .co.SEIKO{background:var(--pink)} .co.TOKAI{background:var(--grape)} .co.KODAK{background:var(--yellow);color:var(--on-yellow)} .co.CHEMI,.co.DAEMYUNG,.co.HANMI{background:var(--red)}
+.co.ZEISS{background:var(--sky)} .co.RODENSTOCK{background:var(--orange)} .co.SHAMIR{background:var(--mint)} .co.SEIKO{background:var(--pink)} .co.TOKAI{background:var(--grape)} .co.KODAK{background:var(--yellow);color:var(--on-yellow)} .co.CHEMI,.co.DAEMYUNG,.co.HANMI{background:var(--red)} .co.NIDEK{background:#1f5fbf}
 .prod{font-weight:700;margin-top:3px}
 .brand{font-size:12px;color:var(--muted)}
 .idx{font-family:var(--mono);font-weight:600}
@@ -181,6 +181,7 @@ body.locked .wrap{display:none}
         <span class="src">호야 컨설팅북 2026</span>
         <span class="src">에실로 가격표 2026 v1</span>
         <span class="src">에실로 Sales &amp; Technical Guide 2026 v1</span>
+        <span class="src">니덱 가격표 Ver.9-1 (2024)</span>
         <span class="src">타사 각인 웹 조사 2026-09 (참고)</span>
       </div>
     </div>
@@ -286,6 +287,7 @@ body.locked .wrap{display:none}
           · 호야 1.55/1.50 칸은 메이리오=1.50, 메이리오 컨트롤=1.55 기준이며, 1.55 주문 시 각인 끝자리 “1L”이 “2L”로 표기됩니다.<br>
           · 바리락스·니콘은 제공 자료에 가격이 없어 사양(각인·도수범위)만 조회됩니다. 각인 아이콘은 글자로 근사 표기했습니다.<br>
           · <b>참고</b> 배지가 붙은 자이스·로덴스톡·샤미르·세이코·도카이·코닥·케미·대명·한미 항목은 2026년 9월 웹 조사 결과입니다. 세이코·도카이는 2012년 일본 자료, 국산은 업계지·커뮤니티 기반이라 실제 렌즈·제조사 자료로 확인 후 사용하세요. 행을 누르면 출처 링크가 보입니다.<br>
+          · 니덱은 권장소비자가격표 Ver.9-1(2024년 2월 시행) 기준입니다. 일반/UV-MAX 가격이 따로 있는 굴절률은 두 줄로 나오며, UV-MAX 마킹은 끝에 u가 붙습니다(NF·SF 누진 마킹 /u·s·h·m·c = 1.74·1.67·1.60·1.55·1.50). 변색 행은 해당 굴절률 기본가 + 변색 추가금입니다.<br>
           · 권장소비자가이며 안경원 정책·검안 수가에 따라 실제 판매가는 다를 수 있습니다.
         </p>
       </section>
@@ -476,6 +478,91 @@ NK5.forEach(([p,sup,rows])=>rows.forEach(([i,rg,m])=>add({co:'NIKON',brand:'니�
  ['변색 구면 트랜지션스 XTRActive',[['1.60','RX','+8.00 / -12.00 (-6.00)','∩3'],['1.50','RX','+8.00 / -10.00 (-6.00)','Nk']]],
  ['변색 비구면 트랜지션스 클래식',[['1.60','여벌','+3.00 / -6.00 (-2.00)','N3C'],['1.56','여벌','+3.00/-5.00(-2.00), -5.25~-6.00 난시없음','N2C']]]].forEach(([p,rows])=>rows.forEach(([i,s,rg,m])=>add({co:'NIKON',brand:'니콘 단초점',prod:p,focus:SV,idx:i,sup:s,photo:/XTRActive/.test(p)?'트랜지션스 XTRActive':(/클래식/.test(p)?'트랜지션스 클래식':'트랜지션스 Gen S'),mark:m,range:rg,note:'각인은 근사 표기 · 가격표 미포함(사양만)'})));
 
+/* ---------------- NIDEK (니덱렌즈 권장소비자가격표 Ver.9-1, 2024-02 시행) ---------------- */
+const NDY={year:'2024',yearNote:'니덱렌즈 권장소비자가격표 Ver.9-1 (2024-02 시행)'};
+const NCODE={'1.74':'u','1.67':'s','1.60':'h','1.55':'m','1.50':'c'};
+const NX='착색 +3만원(1.74 +6만원) / 색필터(개인맞춤컬러·BPI) +8만원 / NIR(근적외선) +4만원 / 울트라PZ 편광 1.67 +20·1.60 +15만원 / 기타(FS가공 외) +2만원';
+const T8=[['트랜스폼3',10],['트랜지션스 8',15],['트랜지션스 XTRActive',20]];
+const PH_STD={'1.67':[['트랜스폼3',10]],'1.60':T8};
+const PH_G={'1.67':[['트랜스폼3',10]],'1.60':T8,'1.55':[['트랜스폼3 (Gray)',10]]};
+const PH_T3={'1.67':[['트랜스폼3',10]],'1.60':[['트랜스폼3',10]]};
+function nid(o){
+  o.rows.forEach(function(row){
+    const idx=row[0], g=row[1], u=row[2];
+    const base=Object.assign({co:'NIDEK',brand:o.brand,prod:o.prod,focus:o.focus,idx:idx,extra:o.extra||NX},NDY);
+    const nt=o.note||'';
+    if(g!=null) add(Object.assign({},base,{coat:o.coat,price:g,mark:o.mark(idx,false),note:nt}));
+    if(u!=null) add(Object.assign({},base,{coat:o.coat+' UV-MAX',price:u,mark:o.mark(idx,true),note:(nt?nt+' · ':'')+'UV-MAX: UV400 + 청광(~420nm) 차단'}));
+    const ph=(o.photo||{})[idx];
+    if(ph){ const b=u!=null?u:g; if(b!=null) ph.forEach(function(x){ add(Object.assign({},base,{coat:o.coat+(u!=null?' UV-MAX':''),photo:x[0],price:b+x[1],mark:o.mark(idx,u!=null),note:(nt?nt+' · ':'')+'변색 +'+x[1]+'만원 포함'})); }); }
+  });
+}
+// 클라비스 — UV-MAX 마킹은 끝에 u
+function CLM(c){ return function(idx,uv){ return uv?c.map(function(x){return x+'u';}).join(' · '):c.join(' · '); }; }
+[['클라비스 HI',['HI','HI1','HI2','HI4'],[['1.74',null,172],['1.67',null,142],['1.60',null,112],['1.55',92,92],['1.50',73,null]],'프리폼 AI 인공지능 설계 · 누진대 8/10/12/14mm'],
+ ['클라비스 HD',['HD','HD0','HD1','HD2','HD3','HD4'],[['1.74',null,162],['1.67',null,132],['1.60',null,102],['1.55',87,87],['1.50',68,null]],'최고급 개인맞춤형 프리폼 · 누진대 9~14mm (1mm 단위)'],
+ ['클라비스 SQ',['SQ','SQ0','SQ2','SQ4'],[['1.74',null,132],['1.67',null,102],['1.60',null,84],['1.55',67,67],['1.50',55,null]],'중거리 특화 · 누진대 8/10/12/14mm'],
+ ['클라비스 GL',['GL','GL1','GL3'],[['1.74',null,111],['1.67',null,84],['1.60',null,69],['1.55',55,55],['1.50',45,null]],'부드러운 수차제어 · 누진대 9/11/13mm'],
+ ['클라비스 데일리',['DA','DA0','DA2','DA4'],[['1.74',null,97],['1.67',null,74],['1.60',null,64],['1.55',49,49],['1.50',38,null]],'소프트(밸런싱) 디자인 · 누진대 8/10/12/14mm']
+].forEach(function(a){ nid({brand:'니덱 클라비스',prod:'니덱 '+a[0],focus:P,coat:'하이밸런스',rows:a[2],mark:CLM(a[1]),photo:a[0]==='클라비스 데일리'?PH_G:PH_STD,note:a[3]+' · 근용인셋 기본 2.5mm (0~4.0mm)'}); });
+nid({brand:'니덱 클라비스',prod:'니덱 클라비스 뷰로',focus:'사무용',coat:'하이밸런스',rows:[['1.74',null,86],['1.67',null,57],['1.60',null,47],['1.55',39,39],['1.50',31,null]],mark:CLM(['BR','BR2']),note:'개인맞춤 중·근용 · 타입 1.3/2.0/4.0/6.0M · 누진대 8/12mm',extra:'착색 +3만원(1.74 +6만원) / 색필터 +8만원 / 울트라PZ 1.67 +20·1.60 +15만원 / 기타 +2만원'});
+nid({brand:'니덱 클라비스',prod:'니덱 클라비스 안티퍼티그',focus:SV,coat:'하이밸런스',rows:[['1.74',null,86],['1.67',null,57],['1.60',null,47],['1.55',39,39],['1.50',31,null]],mark:CLM(['AF']),note:'개인맞춤 피로감소 · A +0.50 / B +0.75 / C +1.00'});
+// NF·SF 누진 — 마킹 /u·s·h·m·c = 1.74·1.67·1.60·1.55·1.50, UV-MAX는 +u
+function NFM(c){ return function(idx,uv){ return c.join(' · ')+' /'+NCODE[idx]+(uv&&idx!=='1.74'?' (+u)':''); }; }
+const NFN='SC-7 초발수 · Yellow Green 코팅';
+[['NF 로이',['R','R2','R4'],[['1.74',null,87],['1.67',null,67],['1.60',null,57],['1.55',46,46],['1.50',36,null]],PH_G,'개인맞춤 밸런싱 설계 · 누진대 10/12/14mm'],
+ ['NF 아이젠',['IG','IG2','IG4'],[['1.67',null,57],['1.60',null,47],['1.55',37,37]],PH_STD,'프레임 최적화 설계 · 누진대 10/12/14mm'],
+ ['NF 캐리어',['C','C3','C5'],[['1.67',null,55],['1.60',null,45],['1.50',28,null]],PH_STD,'내면 비구면 프리폼 · 누진대 11/13/15mm'],
+ ['NF 젠',['ge','ge2','ge4'],[['1.67',null,52],['1.60',null,42],['1.55',34,34],['1.50',25,null]],PH_G,'동양인 최적화 3D가공 · 누진대 10/12/14mm'],
+ ['NF 퍼스트',['f2','f4'],[['1.67',null,42],['1.60',null,34],['1.55',27,27],['1.50',19,null]],null,'초기 노안 전용 소프트 설계 · 누진대 12/14mm · ADD +1.00~+2.00']
+].forEach(function(a){ nid({brand:'니덱 NF누진',prod:'니덱 '+a[0],focus:P,coat:'SC-7',rows:a[2],mark:NFM(a[1]),photo:a[3],note:a[4]+' · '+NFN}); });
+[['SF 얼티마',['UM','UM1','UM3'],[['1.74',null,75],['1.67',null,61],['1.60',null,51],['1.55',39,39],['1.50',30,null]],PH_STD,'안구회선각 반영 개인맞춤 · 누진대 9/11/13mm'],
+ ['SF 비스토',['VI','VI2','VI4'],[['1.67',null,54],['1.60',null,45],['1.55',35,35],['1.50',26,null]],PH_STD,'착용자 Power 반영 설계 · 누진대 10/12/14mm'],
+ ['SF 프로핏',['pr2','pr4'],[['1.67',null,49],['1.60',null,39],['1.55',31,31],['1.50',21,null]],PH_T3,'초기노안 밸런싱 설계 · 누진대 12/14mm']
+].forEach(function(a){ nid({brand:'니덱 SF누진',prod:'니덱 '+a[0],focus:P,coat:'하이밸런스',rows:a[2],mark:NFM(a[1]),photo:a[3],note:a[4]}); });
+// 외면누진·기능성
+nid({brand:'니덱 외면누진',prod:'니덱 아이시스',focus:P,coat:'SC-7',rows:[['1.67',37,null],['1.60',23,null],['1.55',17,null]],mark:function(i){return '∩/'+NCODE[i].toUpperCase();},note:'초기 누진 착용자용 외면 누진 · 누진대 12mm · 최소 프레임 30mm',extra:'착색 +3만원 / 색필터 +8만원 / 기타 +2만원'});
+nid({brand:'니덱 기능성',prod:'니덱 아이티 (EYE-T)',focus:SV,coat:'SC-7',rows:[['1.67',34,null],['1.60',21,null],['1.55',17,null]],mark:function(i){return 'ET/'+NCODE[i].toUpperCase();},note:'피로감소 · 외면 비구면 · B +1.00 / C +1.25',extra:'착색 +3만원 / 기타 +2만원'});
+nid({brand:'니덱 기능성',prod:'니덱 아이티 플러스 W',focus:SV,coat:'SC-7',rows:[['1.74',null,65],['1.67',null,42],['1.60',null,35],['1.55',30,30],['1.50',21,null]],mark:function(i){return 'EP/'+NCODE[i];},photo:PH_STD,note:'개인맞춤 피로감소 · 내면 비구면 · +0.50/+0.75/+1.00/+1.25'});
+nid({brand:'니덱 기능성',prod:'니덱 스마트V',focus:SV,coat:'SC-7',rows:[['1.67',null,29],['1.60',null,25],['1.55',22,22],['1.50',16,null]],mark:function(i,uv){return {'1.67':'VA3','1.60':'VA2','1.55':'VA1','1.50':'VA'}[i]+(uv?'u':'');},note:'조절력 보완 · 수직 Power 특수설계',extra:'착색 +3만원 / 색필터 +8만원 / NIR +4만원 / 울트라PZ +15만원 / 기타 +2만원'});
+nid({brand:'니덱 기능성',prod:'니덱 오피스 플러스',focus:'사무용',coat:'SC-7',rows:[['1.74',null,65],['1.67',null,42],['1.60',null,35],['1.55',30,30],['1.50',21,null]],mark:function(i){return 'OP/'+NCODE[i];},note:'중근용 고급형 · 누진대 12mm · 1.3/2/4M · 인셋 2.0mm · 가입도 +1.00~+3.00'});
+nid({brand:'니덱 기능성',prod:'니덱 오피스 라이트',focus:'사무용',coat:'SC-7',rows:[['1.50',13,null]],mark:function(){return 'O/C';},note:'중근용 일반형 · 누진대 8.5mm · 0.8/1/1.3/2/4M · 가입도 +1.00~+3.50',extra:'착색 +3만원 / 기타 +2만원'});
+nid({brand:'니덱 기능성',prod:'니덱 쥬니아이S',focus:'근시억제',coat:'SC-7',rows:[['1.60',null,37],['1.55',29,29],['1.50',20,null]],mark:function(i){return 'K7/'+NCODE[i];},note:'성장기 근시진행 완화 · 누진대 9mm · A +0.50 / B +1.00 / C +1.50 / D +1.75 · 최소 프레임 26',extra:'착색 +3만원 / 색필터 +8만원 / NIR +4만원 / 울트라PZ +15만원 / 기타 +2만원'});
+// 단초점
+function nsv(o){ add(Object.assign({co:'NIDEK',focus:SV},NDY,o)); }
+[['S-670 ASP','1.67','NA67',17,null],['S-600 ASP','1.60','NA60',14,null],['S-600 SP','1.60','',12,15]].forEach(function(a){
+  const b={brand:'니덱 단초점',prod:'니덱 NIR-가드 '+a[0],idx:a[1],coat:'근적외선 차단·초발수',mark:a[2],note:'자외선·청색광·근적외선 차단',extra:'착색 +3만원 / 울트라PZ 1.67 +20·1.60 +15만원 / 기타 +2만원'};
+  nsv(Object.assign({},b,{sup:'여벌',price:a[3]})); if(a[4]!=null) nsv(Object.assign({},b,{price:a[4],note:b.note+' · 고난시'}));
+});
+[['S-740 ASP','1.74',22,40],['S-670 ASP','1.67',13,20],['S-600 ASP','1.60',10,16],['S-600 SP','1.60',8,14],['S-550 ASP','1.55',6,null]].forEach(function(a){
+  const b={brand:'니덱 단초점',prod:'니덱 UV-MAX 단초점 '+a[0],idx:a[1],coat:'SC-7 UV-MAX',mark:'NIDEK (포그마킹)',note:'UV400 99.9% + 청광(~420nm) 차단',extra:'착색 +3만원(1.74 +6만원) / 색필터 +8만원 / NIR +4만원 / 울트라PZ 1.67 +20·1.60 +15만원 / 기타 +2만원'};
+  nsv(Object.assign({},b,{sup:'여벌',price:a[2]})); if(a[3]!=null) nsv(Object.assign({},b,{price:a[3],note:b.note+(a[1]==='1.74'?' · RX 고난시':'')}));
+});
+[['S-740 듀플러스','1.74','',35,42],['S-670 듀플러스','1.67','DS6',null,23],['S-600 듀플러스','1.60','DS5',null,15]].forEach(function(a){
+  const b={brand:'니덱 단초점',prod:'니덱 '+a[0]+' (양면비구면)',idx:a[1],coat:'하이밸런스 UV-MAX',mark:a[2],note:'양면비구면 · UV420',extra:'착색 +3만원 / NIR +4만원 / 기타 +2만원'};
+  if(a[3]!=null) nsv(Object.assign({},b,{sup:'여벌',price:a[3]}));
+  nsv(Object.assign({},b,{price:a[4],note:b.note+(a[1]==='1.74'?' · RX 고난시':'')}));
+});
+// 기능성 단초점
+[['1.67','HS3',18,19],['1.60','HS2',12,13],['1.55','HS1',10,null]].forEach(function(a){
+  const b={brand:'니덱 기능성 단초점',prod:'니덱 뷰티 (하이커브 4~6)',idx:a[0],note:'패션 하이커브 · 80mm 프레임 대응',extra:'착색 +3만원 / 색필터 +8만원 / 울트라PZ 1.67 +20·1.60 +15만원'};
+  nsv(Object.assign({},b,{coat:'SC-7',price:a[2],mark:a[1]})); if(a[3]!=null) nsv(Object.assign({},b,{coat:'SC-7 UV-MAX',price:a[3],mark:a[1]+'u'}));
+});
+[['O.C 드라이브 1.60 SP','1.60',15,'BPI 드라이브 컬러 20%'],['O.C 드라이브 1.55 SP','1.55',12,'BPI 드라이브 컬러 20%'],['스마트 드라이브 1.60 ASP','1.60',12,'화이트(클리어)']].forEach(function(a){
+  nsv({brand:'니덱 기능성 단초점',prod:'니덱 '+a[0],idx:a[1],sup:'여벌',coat:'SC-7 Green',price:a[2],mark:'',note:'운전용 · '+a[3]}); });
+[['엑스트라 액티브2 1.60 SP','1.60','트랜지션스 XTRActive',32,42,'Gray·Brown'],['트랜지션8 1.60 SP','1.60','트랜지션스 8',null,29,'Gray·Brown'],['트랜지션 클래식 1.60 ASP','1.60','트랜지션스 클래식',17,null,'Gray·Brown'],['트랜지션 클래식 1.55 ASP','1.55','트랜지션스 클래식',13,null,'Gray'],
+ ['트랜스폼3 1.67 SP','1.67','트랜스폼3',40,45,'Gray·Brown · UV-MAX'],['트랜스폼3 1.60 SP','1.60','트랜스폼3',27,32,'Gray·Brown · UV-MAX'],['트랜스폼3 1.55 SP','1.55','트랜스폼3',null,22,'Gray']].forEach(function(a){
+  const b={brand:'니덱 기능성 단초점',prod:'니덱 변색 '+a[0],idx:a[1],coat:'Green',photo:a[2],mark:'',note:a[5]};
+  if(a[3]!=null) nsv(Object.assign({},b,{sup:'여벌',price:a[3],note:a[5]+(a[4]!=null?' · 여벌(RX)':'')})); if(a[4]!=null) nsv(Object.assign({},b,{price:a[4]}));
+});
+[['1.67','PZ7',31,38],['1.60','PZ6',22,27]].forEach(function(a){
+  const b={brand:'니덱 기능성 단초점',prod:'니덱 울트라PZ 코팅편광',idx:a[0],coat:'Green · 편광',mark:a[1],note:'코팅방식 편광 · Gray·Brown·Green (농도 85%) · 무테·반무테 가공 가능'};
+  nsv(Object.assign({},b,{sup:'여벌',price:a[2],note:b.note+' · UV-MAX'})); nsv(Object.assign({},b,{price:a[3],note:b.note+' · RX (편심·커브 변경)'}));
+});
+// 색필터
+[['O.C 개인맞춤 색필터 1.67 ASP','1.67',21],['O.C 개인맞춤 색필터 1.60 SP','1.60',16]].forEach(function(a){ nsv({brand:'니덱 색필터',prod:'니덱 '+a[0],idx:a[1],coat:'Green UV-MAX',price:a[2],mark:'',note:'12가지 컬러 · 농도 A 35% / B 20% / C 15% · 납기 7일'}); });
+[['O.C 기능성 색필터 (EVA·VDT) 1.67 ASP','1.67',21],['O.C 기능성 색필터 (EVA·VDT) 1.60 ASP','1.60',18],['O.C 기능성 색필터 (EVA·VDT) 1.60 SP','1.60',16]].forEach(function(a){ nsv({brand:'니덱 색필터',prod:'니덱 '+a[0],idx:a[1],coat:'Green UV-MAX',price:a[2],mark:'',note:'EVA #1~#3 · VDT Blue/Green/Amber · 농도 20% · 납기 7일'}); });
+
 /* ---------------- 웹 조사 각인 (2026-09 조사, 참고용) ---------------- */
 function W(o){add(Object.assign({sup:'RX'},o));}
 // ZEISS — 코쪽: 제품코드 + 굴절률 2자리 / 귀쪽: 가입도 3자리(225=+2.25)
@@ -541,13 +628,13 @@ R.filter(r=>r.co==='SEIKO'||r.co==='TOKAI').forEach(r=>r.year='2012');
 R.filter(r=>r.co==='DAEMYUNG'&&/펜탁스/.test(r.prod)).forEach(r=>r.year='2019');
 
 /* 양면비구면(양비) 표시 */
-R.forEach(r=>{ r.dasp=r.focus==='단초점'&&/양면비구면|뉴럭스 EP|D-FREE/.test(r.prod); });
+R.forEach(r=>{ r.dasp=r.focus==='단초점'&&/양면비구면|뉴럭스 EP|D-FREE|듀플러스/.test(r.prod); });
 
 /* ---------------- UI ---------------- */
 R.forEach((r,i)=>{r.id=i;r.hay=(r.co+' '+r.brand+' '+r.prod+' '+r.focus+' '+r.coat+' '+r.photo+' '+r.note+' '+r.extra+' '+r.sup+' '+(r.ref||'')).toLowerCase();r.mk=normMark(r.mark);});
 function normMark(s){return (s||'').toUpperCase().replace(/[\s\/*◆·()\-]/g,'');}
 const $=id=>document.getElementById(id);
-const CO=[['','전체'],['HOYA','호야'],['ESSILOR','에실로'],['NIKON','니콘'],['ZEISS','자이스'],['RODENSTOCK','로덴스톡'],['SHAMIR','샤미르'],['SEIKO','세이코'],['TOKAI','도카이'],['KODAK','코닥'],['CHEMI','케미렌즈'],['DAEMYUNG','대명광학'],['HANMI','한미스위스']];
+const CO=[['','전체'],['HOYA','호야'],['ESSILOR','에실로'],['NIKON','니콘'],['ZEISS','자이스'],['RODENSTOCK','로덴스톡'],['SHAMIR','샤미르'],['SEIKO','세이코'],['TOKAI','도카이'],['KODAK','코닥'],['CHEMI','케미렌즈'],['DAEMYUNG','대명광학'],['HANMI','한미스위스'],['NIDEK','니덱']];
 const CONAME=Object.fromEntries(CO);
 const FOCUS=[['','전체'],['단초점','단초점'],['누진다초점','누진다초점'],['사무용','사무용'],['근시억제','근시억제']];
 const IDX=['','1.50','1.55','1.56','1.59','1.60','1.67','1.70','1.74','1.76','1.60양비','1.67양비','1.74양비'];
