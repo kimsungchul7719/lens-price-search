@@ -968,7 +968,7 @@ render();
 /* ---------------- AI 렌즈 상담 챗봇 ---------------- */
 (function(){
 const CO_ALIAS=[['HOYA',/호야|hoya/i],['ESSILOR',/에실로|essilor|바리락스|varilux|아이젠|eyezen|스텔리스트|stellest/i],['NIKON',/니콘|nikon/i],['ZEISS',/자이스|zeiss/i],['RODENSTOCK',/로덴스톡|rodenstock/i],['SHAMIR',/샤미르|shamir/i],['SEIKO',/세이코|seiko/i],['TOKAI',/도카이|토카이|tokai/i],['KODAK',/코닥|kodak/i],['CHEMI',/케미|chemi/i],['DAEMYUNG',/대명|다가스|dagas/i],['HANMI',/한미/i],['NIDEK',/니덱|nidek/i],['EXCELITE',/엑셀라이트|excelite/i]];
-const STOP=/^(가격|얼마|얼마야|알려줘|알려|주세요|추천|추천해줘|렌즈|제품|중에|중|있어|있나요|뭐야|뭐|어떤|찾아줘|검색|보여줘|비교|비교해줘|소비자가|할인가|마크|각인|굴절률|누진|다초점|단초점|변색|여벌|rx|이하|이상|미만|초과|만원|원|가장|제일|싼|저렴한|비싼|좋은|싸게|것|거|은|는|이|가|을|를|의|와|과|로|으로|에서|에|좀|요|종류|종류는|종류가|라인업|목록|리스트|있어요|있나요|뭐가|어떤게|어떤것|무엇|뭐있어|알려주세요|장단점|장점|단점|특징|판매|전략|비교|비교해|다른|회사|조건|좋은|더|대안|타사|가성비|고객|고객에게|어떻게|팔|멘트|설명|차이|괜찮|좋아|해줘|해주세요|저렴|싼거|대체|비슷한)$/i;
+const STOP=/^(가격|얼마|얼마야|알려줘|알려|주세요|추천|추천해줘|렌즈|제품|중에|중|있어|있나요|뭐야|뭐|어떤|찾아줘|검색|보여줘|비교|비교해줘|소비자가|할인가|마크|각인|굴절률|누진|다초점|단초점|변색|여벌|rx|이하|이상|미만|초과|만원|원|가장|제일|싼|저렴한|비싼|좋은|싸게|것|거|은|는|이|가|을|를|의|와|과|로|으로|에서|에|좀|요|종류|종류는|종류가|라인업|목록|리스트|있어요|있나요|뭐가|어떤게|어떤것|무엇|뭐있어|알려주세요|장단점|장점|단점|특징|판매|전략|비교|비교해|다른|회사|조건|좋은|더|대안|타사|가성비|고객|고객에게|어떻게|팔|멘트|설명|차이|괜찮|좋아|해줘|해주세요|저렴|싼거|대체|비슷한|진한|진한것|진한거|어두운|연한|밝은|빠른|다크)$/i;
 const TERM=/변색|렌즈|누진|다초점|단초점|굴절률|가격|코팅|제품|브랜드/;
 const LISTQ=/종류|라인업|목록|리스트|뭐가\s*있|어떤\s*(게|것|제품|렌즈|코팅|변색)|무엇이\s*있|몇\s*가지/;
 function groupBy(rows,field){ const m=new Map(); rows.forEach(r=>{ const k=field==='photo'?r.photo:field==='coat'?r.coat:field==='brand'?r.brand:r.prod; if(!k) return; if(!m.has(k)) m.set(k,{name:k,count:0,prods:new Set(),min:null,max:null,years:new Set()}); const g=m.get(k); g.count++; g.prods.add(r.prod); g.years.add(r.year); if(r.price!=null){ g.min=g.min==null?r.price:Math.min(g.min,r.price); g.max=g.max==null?r.price:Math.max(g.max,r.price);} }); return [...m.values()].map(g=>({이름:g.name,행수:g.count,적용제품수:g.prods.size,적용제품예:[...g.prods].slice(0,4).join(', '),소비자가_최저_만원:g.min,소비자가_최고_만원:g.max,출처연도:[...g.years].join('·')})); }
@@ -1086,8 +1086,46 @@ function salesAnswer(q,p){
     const up=pick[2].price-pick[1].price; t+='\n\n멘트 예) "중간 제품이 가장 많이 선택되세요. 프리미엄은 '+won(up)+' 더 들지만(할인가 기준 '+won(up/2)+') 시야가 더 넓어 적응이 쉽습니다."'; }
   return {text:t,rows:[]};
 }
+/* --- 변색 렌즈 추천 (진하기·속도) --- */
+const PHK=[
+ [/xtractive\s*편광|xtractive 편광|변색편광/i,'트랜지션스 XTRActive 편광',5,2,'가장 진한 계열 + 편광으로 반사광 차단. 낚시·운전·수상 레저에 적합(그레이)'],
+ [/xtractive/i,'트랜지션스 XTRActive',5,3,'가장 어둡게 변색. 실내에서도 옅게 착색되고 차 안(앞유리 뒤)에서도 어느 정도 변색'],
+ [/다크/,'호야 센서티 다크',4,3,'센서티 중 더 진하게 변색되는 타입(호야 “센서티2·다크·샤인·패스트” 옵션에서 다크 선택)'],
+ [/gen\s*s/i,'트랜지션스 Gen S',3,5,'변색·탈색이 가장 빠름(2분 이내 탈색). 실내 완전 투명, 실외 선글라스급. 컬러 8종'],
+ [/트랜지션스 8|트랜지션8/,'트랜지션스 8',3,4,'표준 변색, 실내 투명'],
+ [/센서티3/,'호야 센서티3',3,4,'호야 최신 변색. 빠른 반응·실내 투명'],
+ [/센서티 컬러/,'호야 센서티 컬러',3,4,'컬러·반미러 변색(패션용)'],
+ [/트랜스폼3/,'니덱 트랜스폼3',3,3,'니덱 변색(그레이·브라운)'],
+ [/센서티2|센서티/,'호야 센서티2 (패스트·샤인 포함)',3,3,'표준 변색. 패스트는 빠른 탈색, 샤인은 반미러'],
+ [/클래식/,'트랜지션스 클래식',2,2,'기본형 변색(여벌 위주)'],
+ [/솔리오/,'호야 솔리오2',2,2,'실속형 변색(여벌)'],
+ [/엑셀라이트 변색/,'엑셀라이트 변색',3,3,'2018 자료 — 오래된 가격']
+];
+function phKind(photo){ for(const k of PHK) if(k[0].test(photo||'')) return k; return [null,photo,3,3,'']; }
+const PHOTOQ=/진한|진하|어두|다크|짙|선글|연한|옅|밝|빠른|빨리|탈색|추천|비교|차이|좋은|어떤|뭐가/;
+function photoAnswer(q,p){
+  const rows=search({company:p.company,index:p.index,focus:p.focus==='다초점'?'누진다초점':p.focus,supply:p.supply,photochromic:true,pricedOnly:true,maxPrice:p.maxPrice,minPrice:p.minPrice});
+  if(!rows.length) return null;
+  const want=/진한|진하|어두|다크|짙|선글/.test(q)?'dark':/빠른|빨리|탈색/.test(q)?'fast':/연한|옅|밝/.test(q)?'light':'dark';
+  const g=new Map();
+  rows.forEach(r=>{ const k=phKind(r.photo); const key=k[1]; if(!g.has(key)) g.set(key,{k,rows:[]}); g.get(key).rows.push(r); });
+  let list=[...g.values()];
+  list.sort((a,b)=> want==='fast'?(b.k[3]-a.k[3])||(b.k[2]-a.k[2]):want==='light'?(a.k[2]-b.k[2]):(b.k[2]-a.k[2])||(b.k[3]-a.k[3]));
+  const dots=n=>'●'.repeat(n)+'○'.repeat(5-n);
+  const who=p.company.map(c=>CONAME[c]).join('·');
+  let t=(want==='dark'?'진하게 변색되는 순으로':want==='fast'?'변색·탈색이 빠른 순으로':'옅게 변색되는 순으로')+' 추천해요'+(who?' ('+who+')':'')+(p.index?' · '+p.index:'')+(p.focus?' · '+p.focus:'')+'.\n';
+  list.slice(0,5).forEach((x,i)=>{
+    const rs=x.rows.slice().sort((a,b)=>(RECENT(b.year)-RECENT(a.year))||(a.price-b.price));
+    const ex=[]; const seen=new Set(); rs.forEach(r=>{ const kk=r.co+r.prod; if(ex.length<2&&!seen.has(kk)){ seen.add(kk); ex.push(r);} });
+    t+='\n'+(i+1)+'. '+x.k[1]+'  진하기 '+dots(x.k[2])+' · 속도 '+dots(x.k[3])+'\n   '+x.k[4]+'\n'+ex.map(r=>'   예) '+(CONAME[r.co]||r.co)+' '+r.prod+' '+r.idx+(r.sup==='여벌'?' 여벌':'')+' '+won(r.price)+' (할인가 '+won(r.price/2)+') · 출처 '+r.year+(RECENT(r.year)?'':' ⚠오래된 자료')).join('\n');
+  });
+  t+='\n\n[일반 정보] 변색 렌즈는 자외선에 반응해서 차 안(앞유리)에서는 잘 어두워지지 않아요 — 운전용으로 진한 색이 필요하면 XTRActive 계열이나 편광을 권해요. 진하기·속도 점수는 제조사 설명을 바탕으로 한 상대 비교예요.';
+  t+='\n회사·굴절률을 같이 말하면 더 정확해요. 예) "호야 1.60 누진 진한 변색 추천"';
+  return {text:t,rows:[]};
+}
 function localAnswer(q){
   const p=parse(q); let rows=search(p);
+  if(p.photochromic===true&&PHOTOQ.test(q)&&!/종류|라인업|목록/.test(q)&&!SALEQ.test(q)){ const a=photoAnswer(q,p); if(a) return a; }
   if(SALEQ.test(q)) return salesAnswer(q,p);
   if(FEATQ.test(q)&&!CMPQ.test(q)){ const a=featureAnswer(q,p); if(a) return a; }
   if(CMPQ.test(q)&&!/종류|라인업|목록/.test(q)){ const a=compareAnswer(q,p); if(a) return a; }
@@ -1118,6 +1156,7 @@ const RULES=`너는 안경원 카운터에서 쓰는 "렌즈 마크/소비자가
 4) 추천을 요청하면 도수·나이·용도·예산을 확인하는 질문을 한두 개 하고, 조회한 제품 2~4개를 비교해 제시한다.
 5) 다른 회사와 가격 비교를 요청하면 같은 굴절률·초점 조건으로 회사별로 search_lenses를 조회해 회사별 최저/대표 가격을 비교하고, 비슷한 가격대의 더 좋은 조건(상위 설계·최신 자료)이나 더 저렴한 대안을 근거와 함께 추천한다.
 6) 판매 전략을 물으면 [일반 조언]으로: 고객 요구 질문 → 실속/중간/프리미엄 3단계 제시(앱 자료의 실제 가격 사용) → 소비자가와 50% 할인가 안내 → 필요한 옵션(변색·블루라이트·굴절률)만 제안 → 적응 안내·신뢰, 과장 금지를 구체적 멘트 예시와 함께 알려준다.
+6-1) 변색 추천(진한/빠른/연한 등)은 photochromic=true로 search_lenses를 조회하고, 변색 종류별 진하기·속도를 비교해 추천한다. [일반 정보] 진하기: XTRActive·XTRActive 편광 가장 진함 > 센서티 다크 > Gen S·센서티3·트랜지션스8·트랜스폼3 > 클래식·솔리오2. 속도: Gen S 가장 빠름. 변색은 차 안에서 잘 안 어두워짐.
 7) 제품 특성·장단점을 물으면 자료의 메모·등급·가격 위치를 먼저 쓰고, 설계 특성·장단점은 [일반 정보]로 덧붙인다.
 8) 의학적 진단은 하지 않는다. 답은 18줄 이내, 간단한 목록으로.`;
 const TOOL2={name:'list_options',description:'조건에 맞는 자료에서 변색 종류(photo)·코팅 종류(coat)·브랜드(brand)·제품(prod)의 목록을 중복 없이 돌려준다. 각 항목에 적용 제품 수, 소비자가 최저/최고(만원), 출처연도가 붙는다. "~종류는?" 같은 질문에 먼저 쓴다.',
