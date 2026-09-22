@@ -123,7 +123,7 @@ tbody tr:last-child td{border-bottom:0}
 td.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
 .co{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:1px 8px;color:#fff;background:var(--grape)}
 .co.HOYA{background:var(--hoya)} .co.ESSILOR{background:var(--essilor)} .co.NIKON{background:var(--nikon)}
-.co.ZEISS{background:var(--sky)} .co.RODENSTOCK{background:var(--orange)} .co.SHAMIR{background:var(--mint)} .co.SEIKO{background:var(--pink)} .co.TOKAI{background:var(--grape)} .co.KODAK{background:var(--yellow);color:var(--on-yellow)} .co.CHEMI,.co.DAEMYUNG,.co.HANMI{background:var(--red)} .co.NIDEK{background:#1f5fbf}
+.co.ZEISS{background:var(--sky)} .co.RODENSTOCK{background:var(--orange)} .co.SHAMIR{background:var(--mint)} .co.SEIKO{background:var(--pink)} .co.TOKAI{background:var(--grape)} .co.KODAK{background:var(--yellow);color:var(--on-yellow)} .co.CHEMI,.co.DAEMYUNG,.co.HANMI{background:var(--red)} .co.NIDEK{background:#1f5fbf} .co.EXCELITE{background:#2b3a8f}
 .prod{font-weight:700;margin-top:3px}
 .brand{font-size:12px;color:var(--muted)}
 .idx{font-family:var(--mono);font-weight:600}
@@ -183,6 +183,7 @@ body.locked .wrap{display:none}
         <span class="src">에실로 Sales &amp; Technical Guide 2026 v1</span>
         <span class="src">바리락스 가격표 2025 v2</span>
         <span class="src">니콘·트랜지션스 가격표 2025 v1</span>
+        <span class="src">엑셀라이트 가격표 (2018-10)</span>
         <span class="src">니덱 가격표 Ver.9-1 (2024)</span>
         <span class="src">타사 각인 웹 조사 2026-09 (참고)</span>
       </div>
@@ -290,6 +291,7 @@ body.locked .wrap{display:none}
           · 바리락스는 권장소비자가격표 2025 v2(2025년 12월 적용) 기준이며, 변색 행은 기본 코팅가 + 변색 20만원입니다. 니콘·트랜지션스는 권장소비자가격표 2025 v1(2025년 5월 적용) 기준이며, 변색·편광·미러 행은 기본가에 추가금을 더한 금액입니다. 각인 아이콘은 글자로 근사 표기했습니다.<br>
           · <b>참고</b> 배지가 붙은 자이스·로덴스톡·샤미르·세이코·도카이·코닥·케미·대명·한미 항목은 2026년 9월 웹 조사 결과입니다. 세이코·도카이는 2012년 일본 자료, 국산은 업계지·커뮤니티 기반이라 실제 렌즈·제조사 자료로 확인 후 사용하세요. 행을 누르면 출처 링크가 보입니다.<br>
           · 니덱은 권장소비자가격표 Ver.9-1(2024년 2월 시행) 기준입니다. 일반/UV-MAX 가격이 따로 있는 굴절률은 두 줄로 나오며, UV-MAX 마킹은 끝에 u가 붙습니다(NF·SF 누진 마킹 /u·s·h·m·c = 1.74·1.67·1.60·1.55·1.50). 변색 행은 해당 굴절률 기본가 + 변색 추가금입니다.<br>
+          · 엑셀라이트는 권장소비자가격표(2018년 10월 적용) 기준입니다. 마킹 끝 문자는 굴절률·소재입니다(U 1.74 · H 1.67 · M 1.60 · C 1.50 · 6/J 변색1.60 · S 변색1.56 · 7 변색1.67 · 3 TVX1.60 · V TVX1.53 · X 변색TVX · G 편광변색 · E 편광1.6 · D 편광1.5). TVX(Trivex) 1.53은 굴절률 1.53으로 분류했습니다.<br>
           · 권장소비자가이며 안경원 정책·검안 수가에 따라 실제 판매가는 다를 수 있습니다.
         </p>
       </section>
@@ -758,6 +760,48 @@ Object.keys(V).forEach(function(k){ if(used[k]) return; const nw=NEW[k]; if(!nw)
 window.__nikonMissing=Object.keys(V).filter(function(k){return !used[k];});
 })();
 
+/* ---------------- 엑셀라이트 (Excelite USA) 권장소비자가격표 2018-10 적용 ---------------- */
+(function(){
+const Y={year:'2018',yearNote:'엑셀라이트 권장소비자가격표 (2018-10 적용)'};
+const EXX='컬러추가 1.50~1.67 +3만원(견본 +4만원) · 1.74 +6만원(20%) · TVX +10만원 / 프리즘 +5만원 / 하이콘트라스트 +5만원 / 편심 +5만원 / 고도난시 +5만원 / 커브지정 +3만원(하이커브 +4만원) / 75Ø 지정 무상·80Ø(1.6·1.67) +5만원 / 미러코팅 +5만원 / 프레칼 +5만원 / UV추가(1.5) +3만원 / 청광차단코팅 +3만원(1.60 이상) / 퍼팩트제로 UV코팅 +4만원(1.74 제외)';
+function lab(l){
+  const pol=/편광/.test(l), ph=/변색/.test(l), tvx=/TVX/.test(l);
+  let n=(l.match(/1\.\d+/)||[''])[0]; if(!n&&tvx) n='1.53'; if(n==='1.6') n='1.60'; if(n==='1.5') n='1.50'; if(!n&&/16$/.test(l)) n='1.60';
+  return {idx:n, coat:(tvx?'Trivex HDMT':'hydrotec 초경발수')+(pol?' · 편광':''), photo:ph?'엑셀라이트 변색 (브라운/그레이)':''};
+}
+const EX=[
+ ['엑셀라이트 누진','프리스타일 인텔리전트',P,'맞춤 내면 아토릭 누진 · 컴퓨터·중간거리 업무용 · 누진대 7~13mm · ADD +0.50~+3.50',[['편광변색1.6','IG',80],['편광1.6','IE',70],['편광1.5','ID',60],['변색TVX','IX',100],['변색1.67','I7',90],['변색1.6','IJ',80],['변색1.56','IS',70],['TVX1.60','I3',60],['TVX1.53','IV',60],['1.74','IU',100],['1.67','IH',70],['1.6','IM',60],['1.5','IC',50]]],
+ ['엑셀라이트 누진','멀티프리 슈퍼트',P,'최상급 전후 복합 아토릭 누진 · 퍼펙트 제로 UV 코팅 · 누진대 7~13mm · 편심·인셋 지정 불가',[['1.67','FH',80],['1.6','FM',60]]],
+ ['엑셀라이트 누진','프리스타일 프로',P,'맞춤형 내면 아토릭 누진 · Best Seller · 누진대 7~13mm · 인셋 지정(0~5mm)',[['변색TVX','PX',90],['변색1.60','P6',70],['변색1.56','PS',60],['TVX1.60','P3',60],['1.74','PU',90],['1.67','PH',60],['1.6','PM',50],['1.5','PC',40]]],
+ ['엑셀라이트 누진','디스커버리 플러스',P,'맞춤형 레포츠 내면 아토릭 누진 · Million Seller · 누진대 12/14mm',[['변색TVX','UX',80],['변색1.60','U6',60],['변색1.56','US',50],['TVX1.60','U3',50],['1.74','UU',70],['1.67','UH',50],['1.6','UM',40],['1.5','UC',30]]],
+ ['엑셀라이트 누진','디스커버리 엑스트라',P,'내면 아토릭 설계 누진 · 합리적 가격 · 누진대 11/13mm · 편심 불가',[['변색1.60','T6',50],['변색1.56','TS',40],['TVX1.53','TV',40],['1.67','TH',38],['1.6','TM',32],['1.5','TC',25]]],
+ ['엑셀라이트 누진','프리스타일 컨피던스 와이드',P,'맞춤 내면 아토릭 누진 · 누진대 7~13mm (가격표에 수기 메모 있음 — 인쇄가 기준)',[['변색1.6','CJ',100],['변색1.56','CS',90],['1.67','CH',90],['1.6','CM',80],['1.5','CC',70]]],
+ ['엑셀라이트 누진','프리스타일 컨피던스 프로',P,'맞춤형 내면 아토릭 누진 · 누진대 9~13mm · UV차단 1.60변색 420/1.56변색 380/1.67·1.6 400/1.5 350 (수기 메모 있음 — 인쇄가 기준)',[['변색1.60','DPJ',80],['변색1.56','DPS',70],['1.67','DPH',70],['1.6','DPM',60],['1.5','DPC',50]]],
+ ['엑셀라이트 기능성','프리스타일 오피스','사무용','맞춤형 중근용 · 누진대 9mm · 원용 목적거리 지정 가능',[['TVX1.60','O3',50],['1.74','OU',70],['1.67','OH',45],['1.6','OM',35],['1.5','OC',25]]],
+ ['엑셀라이트 기능성','프리스타일 키즈','근시억제','맞춤형 근시 케어 · 7~15세 · 누진대 7mm · 기본 ADD +1.50 (+1.00~+1.75 지정)',[['TVX1.60','K3',50],['1.74','KU',70],['1.67','KH',45],['1.6','KM',35],['1.5','KC',25]]],
+ ['엑셀라이트 기능성','프리스타일 모노',SV,'맞춤형 안정피로 완화 · A +0.50 / B +0.75 / C +0.87 · 누진대 9mm',[['변색1.6','M6',60],['변색1.56','MS',45],['TVX1.6','M3',50],['1.74','MU',70],['1.67','MH',45],['1.6','MM',35],['1.5','MC',25]]],
+ ['엑셀라이트 기능성','프리스타일 컨피던스 모노',SV,'맞춤형 근시 어시스트 · A +0.50 / B +0.75 / C +0.87 · 누진대 9mm (수기 메모 있음 — 인쇄가 기준)',[['변색1.60','DMJ',60],['변색1.56','DMS',45],['1.67','DMH',45],['1.6','DMM',35],['1.5','DMC',25]]],
+ ['엑셀라이트 단초점','프리스타일 하이퍼 모노',SV,'개인 맞춤 아토릭 단초점 · 프레칼 가공 · 이니셜 마킹(영문 3자리) 선택',[['변색TVX','HX',80],['변색1.67','H7',70],['변색1.60','H6',60],['변색1.56','HS',45],['TVX1.60','H3',50],['1.74','HU',70],['1.67','HH',{ST:30,RX:43}],['1.6','HM',{ST:25,RX:33}]]],
+ ['엑셀라이트 단초점','기능성 디지털토릭',SV,'편광·변색·Trivex 디지털토릭 단초점',[['편광변색16','◇',60],['편광1.60','◇',50],['편광1.50','◇',28],['변색TVX','—',55],['변색1.67','◇',60],['변색1.6','◇',45],['변색1.56','◇',{ST:15,RX:28}],['TVX1.60','—',33],['TVX1.53','—',{ST:15,RX:25}]]],
+ ['엑셀라이트 단초점','내면 디지털 단초점',SV,'디지털토릭 · 내면 디지털 가공',[['1.74','◇',{RX:48}],['1.67','◇',{RX:30}],['1.6블루','◇',{ST:18,RX:23}],['1.6','◇',{RX:20}]]],
+ ['엑셀라이트 단초점','더블디지털토릭 양면 디지털 단초점 (양면비구면)',SV,'프로텍 특수내열 초경발수 · 컬러추가 불가 · 1.74 S-4.00~S-15.00 / 1.67 S-2.00~S-10.00',[['1.74','Ⓐ',{ST:53}],['1.67','Ⓐ',{ST:35}]]],
+ ['엑셀라이트 스포츠','스포츠 NXT 변색 (그레이·브라운·COOPER·DAYNITE)',SV,'NXT 변색(35→70%) · Trivex 소재 · 스포츠 맞춤 · 특수가공비 난이도 하 6 / 중 9 / 상 12만원',[['변색TVX','◇',{디지털환산:48,리버티맞춤:60}]]],
+ ['엑셀라이트 스포츠','스포츠 NXT 일반 (그린·그레이·브라운)',SV,'NXT 일반 착색 75% · Trivex 소재 · 특수가공비 난이도 하 6 / 중 9 / 상 12만원',[['TVX1.53','◇',{디지털환산:38,리버티맞춤:50}]]],
+ ['엑셀라이트 스포츠','스포츠 일반·변색·편광',SV,'스포츠 환산/맞춤 가공 · 특수가공비 난이도 하 6 / 중 9 / 상 12만원',[['편광변색1.6','◇/LG',{디지털환산:70,리버티맞춤:80}],['편광1.60','◇/LE',{디지털환산:60,리버티맞춤:70}],['편광1.50','◇/LD',{디지털환산:38,리버티맞춤:50}],['변색TVX','◇/LX',{디지털환산:60,리버티맞춤:75}],['변색1.60','◇/L6',{디지털환산:60,리버티맞춤:70}],['TVX1.60','◇/L3',{디지털환산:40,리버티맞춤:52}],['1.67','◇/LH',{디지털환산:38,리버티맞춤:45}],['1.6','◇/LM',{디지털환산:28,리버티맞춤:35}],['1.5','◇/LC',{디지털환산:18,리버티맞춤:25}]]]
+];
+EX.forEach(function(g){ g[4].forEach(function(it){
+  const L=lab(it[0]), base=Object.assign({co:'EXCELITE',brand:g[0],prod:'엑셀라이트 '+g[1],focus:g[2],idx:L.idx,coat:L.coat,photo:L.photo,mark:it[1],note:g[3]+' · 가격표 표기: '+it[0],extra:EXX},Y);
+  if(/블루/.test(it[0])) base.coat+=' · 블루';
+  const p=it[2];
+  if(typeof p==='number'){ add(Object.assign({},base,{price:p})); return; }
+  Object.keys(p).forEach(function(k){
+    if(k==='ST') add(Object.assign({},base,{sup:'여벌',price:p[k]}));
+    else if(k==='RX') add(Object.assign({},base,{price:p[k]}));
+    else add(Object.assign({},base,{coat:base.coat+' · '+k,price:p[k]}));
+  });
+}); });
+})();
+
 /* 출처연도 */
 const YEAR_BY_SRC={[Z_SRC]:'2024',[Z_FO]:'연도미상',[RD_SRC]:'2022','http://www.opticnews.co.kr/news/articleView.html?idxno=23898':'연도미상',[SH_SRC]:'2021',[SK_SRC]:'2012',[CH_SRC]:'2019','http://www.kmedinfo.co.kr/news/articleView.html?idxno=31799':'2015','https://www.clien.net/service/board/lecture/14105735':'2019',[DG_SRC]:'2024','https://www.eyeopt.co.kr/xe/pal2/3253932':'2010·2026'};
 R.forEach(r=>{
@@ -775,10 +819,10 @@ R.forEach(r=>{ r.dasp=r.focus==='단초점'&&/양면비구면|뉴럭스 EP|D-FRE
 R.forEach((r,i)=>{r.id=i;r.hay=(r.co+' '+r.brand+' '+r.prod+' '+r.focus+' '+r.coat+' '+r.photo+' '+r.note+' '+r.extra+' '+r.sup+' '+(r.ref||'')).toLowerCase();r.mk=normMark(r.mark);});
 function normMark(s){return (s||'').toUpperCase().replace(/[\s\/*◆·()\-]/g,'');}
 const $=id=>document.getElementById(id);
-const CO=[['','전체'],['HOYA','호야'],['ESSILOR','에실로'],['NIKON','니콘'],['ZEISS','자이스'],['RODENSTOCK','로덴스톡'],['SHAMIR','샤미르'],['SEIKO','세이코'],['TOKAI','도카이'],['KODAK','코닥'],['CHEMI','케미렌즈'],['DAEMYUNG','대명광학'],['HANMI','한미스위스'],['NIDEK','니덱']];
+const CO=[['','전체'],['HOYA','호야'],['ESSILOR','에실로'],['NIKON','니콘'],['ZEISS','자이스'],['RODENSTOCK','로덴스톡'],['SHAMIR','샤미르'],['SEIKO','세이코'],['TOKAI','도카이'],['KODAK','코닥'],['CHEMI','케미렌즈'],['DAEMYUNG','대명광학'],['HANMI','한미스위스'],['NIDEK','니덱'],['EXCELITE','엑셀라이트']];
 const CONAME=Object.fromEntries(CO);
 const FOCUS=[['','전체'],['단초점','단초점'],['누진다초점','누진다초점'],['사무용','사무용'],['근시억제','근시억제']];
-const IDX=['','1.50','1.55','1.56','1.59','1.60','1.67','1.70','1.74','1.76','1.60양비','1.67양비','1.74양비'];
+const IDX=['','1.50','1.53','1.55','1.56','1.59','1.60','1.67','1.70','1.74','1.76','1.60양비','1.67양비','1.74양비'];
 const SUP=[['','전체'],['RX','RX'],['여벌','여벌']];
 const st={co:'',focus:'',idx:'',sup:'',open:null};
 function seg(el,items,key){
