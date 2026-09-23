@@ -968,7 +968,7 @@ render();
 /* ---------------- AI 렌즈 상담 챗봇 ---------------- */
 (function(){
 const CO_ALIAS=[['HOYA',/호야|hoya/i],['ESSILOR',/에실로|essilor|바리락스|varilux|아이젠|eyezen|스텔리스트|stellest/i],['NIKON',/니콘|nikon/i],['ZEISS',/자이스|zeiss/i],['RODENSTOCK',/로덴스톡|rodenstock/i],['SHAMIR',/샤미르|shamir/i],['SEIKO',/세이코|seiko/i],['TOKAI',/도카이|토카이|tokai/i],['KODAK',/코닥|kodak/i],['CHEMI',/케미|chemi/i],['DAEMYUNG',/대명|다가스|dagas/i],['HANMI',/한미/i],['NIDEK',/니덱|nidek/i],['EXCELITE',/엑셀라이트|excelite/i]];
-const STOP=/^(가격|얼마|얼마야|알려줘|알려|주세요|추천|추천해줘|렌즈|제품|중에|중|있어|있나요|뭐야|뭐|어떤|찾아줘|검색|보여줘|비교|비교해줘|소비자가|할인가|마크|각인|굴절률|누진|다초점|단초점|변색|여벌|rx|이하|이상|미만|초과|만원|원|가장|제일|싼|저렴한|비싼|좋은|싸게|것|거|은|는|이|가|을|를|의|와|과|로|으로|에서|에|좀|요|종류|종류는|종류가|라인업|목록|리스트|있어요|있나요|뭐가|어떤게|어떤것|무엇|뭐있어|알려주세요|장단점|장점|단점|특징|판매|전략|비교|비교해|다른|회사|조건|좋은|더|대안|타사|가성비|고객|고객에게|어떻게|팔|멘트|설명|차이|괜찮|좋아|해줘|해주세요|저렴|싼거|대체|비슷한|진한|진한것|진한거|어두운|연한|밝은|빠른|다크)$/i;
+const STOP=/^(가격|얼마|얼마야|알려줘|알려|주세요|추천|추천해줘|렌즈|제품|중에|중|있어|있나요|뭐야|뭐|어떤|찾아줘|검색|보여줘|비교|비교해줘|소비자가|할인가|마크|각인|굴절률|누진|다초점|단초점|변색|여벌|rx|이하|이상|미만|초과|만원|원|가장|제일|싼|저렴한|비싼|좋은|싸게|것|거|은|는|이|가|을|를|의|와|과|로|으로|에서|에|좀|요|종류|종류는|종류가|라인업|목록|리스트|있어요|있나요|뭐가|어떤게|어떤것|무엇|뭐있어|알려주세요|장단점|장점|단점|특징|판매|전략|비교|비교해|다른|회사|조건|좋은|더|대안|타사|가성비|고객|고객에게|어떻게|팔|멘트|설명|차이|괜찮|좋아|해줘|해주세요|저렴|싼거|대체|비슷한|진한|진한것|진한거|어두운|연한|밝은|빠른|다크|어느|어디|누가|제조사|만드는|곳|제품은|제품)$/i;
 const TERM=/변색|렌즈|누진|다초점|단초점|굴절률|가격|코팅|제품|브랜드/;
 const LISTQ=/종류|라인업|목록|리스트|뭐가\s*있|어떤\s*(게|것|제품|렌즈|코팅|변색)|무엇이\s*있|몇\s*가지/;
 function groupBy(rows,field){ const m=new Map(); rows.forEach(r=>{ const k=field==='photo'?r.photo:field==='coat'?r.coat:field==='brand'?r.brand:r.prod; if(!k) return; if(!m.has(k)) m.set(k,{name:k,count:0,prods:new Set(),min:null,max:null,years:new Set()}); const g=m.get(k); g.count++; g.prods.add(r.prod); g.years.add(r.year); if(r.price!=null){ g.min=g.min==null?r.price:Math.min(g.min,r.price); g.max=g.max==null?r.price:Math.max(g.max,r.price);} }); return [...m.values()].map(g=>({이름:g.name,행수:g.count,적용제품수:g.prods.size,적용제품예:[...g.prods].slice(0,4).join(', '),소비자가_최저_만원:g.min,소비자가_최고_만원:g.max,출처연도:[...g.years].join('·')})); }
@@ -1148,8 +1148,55 @@ function photoAnswer(q,p){
   o.foot='※ 변색 렌즈는 차 안(앞유리 뒤)에서 잘 어두워지지 않아요. 운전용이면 XTRActive나 편광을 권해요.\n※ 진하기·속도는 제조사 설명 기반 상대 비교예요. 회사·굴절률을 함께 말하면 더 정확해요.';
   return o;
 }
-function localAnswer(q){
+/* --- "어느 회사?" 브랜드 질문 --- */
+const WHOQ=/어느\s*회사|어디\s*회사|어느\s*브랜드|어디\s*브랜드|누가\s*만|제조사|만드는|어디\s*제품|어느\s*제조|어느\s*곳|회사\s*(가|는|야|니|인가|인지)/;
+function normQ(q){ return q.replace(/트렌지션|트랜지숀|트란지션/g,'트랜지션').replace(/x?tra+\s*-?\s*a?ctive|atractive|extra\s*active|엑스트라\s*-?\s*[액엑]티브|엑트라\s*[액엑]티브|액티브2/gi,'XTRActive').replace(/gen\s*-?\s*s/gi,'Gen S'); }
+const BRANDS=[
+ [/xtractive\s*편광|xtractive polarized/i,'트랜지션스 XTRActive 편광(XTRACTIVE POLARIZED)','미국 트랜지션스 옵티컬(Transitions Optical)의 변색 브랜드. 에실로룩소티카 계열이며, 여러 렌즈 제조사가 라이선스로 자사 렌즈에 적용해요.'],
+ [/xtractive/i,'트랜지션스 XTRActive','미국 트랜지션스 옵티컬(Transitions Optical)의 변색 브랜드. 에실로룩소티카 계열이며, 여러 렌즈 제조사가 라이선스로 자사 렌즈에 적용해요. 렌즈 자체를 만드는 회사는 에실로·니콘·니덱 등 적용 제조사예요.'],
+ [/gen\s*s/i,'트랜지션스 Gen S','트랜지션스 옵티컬의 최신 변색 세대. 여러 제조사가 적용해요.'],
+ [/트랜지션스?\s*8|트랜지션8/,'트랜지션스 8','트랜지션스 옵티컬의 이전 세대 변색.'],
+ [/트랜지션.*클래식|클래식.*트랜지션/,'트랜지션스 클래식','트랜지션스 옵티컬의 기본형 변색.'],
+ [/트랜지션/,'트랜지션스(Transitions)','미국 트랜지션스 옵티컬의 변색렌즈 브랜드(에실로룩소티카 계열). 렌즈 제조사가 아니라 변색 기술 브랜드예요.'],
+ [/센서티/,'센서티(Sensity)','호야(HOYA)의 자체 변색렌즈 브랜드.'],
+ [/솔리오/,'솔리오(Sunlio)','호야 스텔리파이 계열에 쓰이는 변색 옵션.'],
+ [/트랜스폼/,'트랜스폼3','니덱(NIDEK) 가격표의 변색 옵션.'],
+ [/xperio|엑스페리오/i,'엑스페리오(Xperio)','에실로의 편광렌즈 브랜드. 니콘 가격표에도 편광 옵션으로 들어가요.'],
+ [/울트라\s*pz|ultra\s*pz/i,'울트라PZ','니덱의 코팅 방식 편광.'],
+ [/crizal|크리잘/i,'크리잘(Crizal)','에실로의 코팅 브랜드.'],
+ [/메이리오|울트라브이/,'메이리오·울트라브이','호야의 코팅 브랜드.'],
+ [/see\+uv|seeblue|see ?uv/i,'SEE+UV·SEEBLUE','니콘의 코팅 브랜드.'],
+ [/바리락스|varilux/i,'바리락스(Varilux)','에실로(Essilor)의 누진렌즈 브랜드.'],
+ [/스텔리스트|stellest/i,'스텔리스트(Stellest)','에실로의 어린이 근시억제 렌즈.'],
+ [/아이젠|eyezen/i,'아이젠(Eyezen)','에실로의 단초점 브랜드.'],
+ [/nxt/i,'NXT','엑셀라이트가 쓰는 스포츠용 Trivex 계열 소재 브랜드.'],
+ [/trivex|트라이벡스|tvx/i,'Trivex(TVX)','미국 PPG가 개발한 렌즈 소재. 여러 회사가 사용해요.']
+];
+function whoAnswer(q0,p){
+  const q=normQ(q0);
+  const hit=BRANDS.find(b=>b[0].test(q));
+  const key=hit?hit[1]:null;
+  let rows=[];
+  if(hit){ rows=R.filter(r=>hit[0].test((r.photo||'')+' '+(r.coat||'')+' '+r.prod+' '+r.brand)); }
+  if(!rows.length){ const kw=(p.keywords||'').toLowerCase().split(/\s+/).filter(Boolean); if(kw.length) rows=R.filter(r=>kw.every(t=>r.hay.includes(t))); }
+  if(!rows.length&&!hit) return null;
+  let t='';
+  if(hit) t+='■ '+hit[1]+'\n[일반 정보] '+hit[2]+'\n';
+  if(rows.length){
+    const byCo=new Map(); rows.forEach(r=>{ if(!byCo.has(r.co)) byCo.set(r.co,[]); byCo.get(r.co).push(r); });
+    t+='\n■ 앱 자료에서 이 이름이 나오는 회사 '+byCo.size+'곳';
+    [...byCo.entries()].sort((a,b)=>b[1].length-a[1].length).forEach(([co,rs])=>{
+      const ps=rs.filter(r=>r.price!=null).map(r=>r.price), ex=[...new Set(rs.map(r=>r.prod))].slice(0,3).join(', ');
+      t+='\n· '+(CONAME[co]||co)+' — '+rs.length+'건'+(ps.length?' · '+won(Math.min(...ps))+' ~ '+won(Math.max(...ps)):' · 가격 미기재')+'\n   예) '+ex;
+    });
+    t+='\n\n※ 가격은 그 회사 렌즈에 이 옵션을 넣었을 때의 앱 자료 기준 금액이에요.';
+  } else t+='\n앱 자료에는 이 이름이 나오지 않아요.';
+  return {text:t,rows:[]};
+}
+function localAnswer(q0){
+  const q=normQ(q0);
   const p=parse(q); let rows=search(p);
+  if(WHOQ.test(q)){ const a=whoAnswer(q,p); if(a) return a; }
   if(p.photochromic===true&&PHOTOQ.test(q)&&!/종류|라인업|목록/.test(q)&&!SALEQ.test(q)){ const a=photoAnswer(q,p); if(a) return a; }
   if(SALEQ.test(q)) return salesAnswer(q,p);
   if(FEATQ.test(q)&&!CMPQ.test(q)){ const a=featureAnswer(q,p); if(a) return a; }
@@ -1177,6 +1224,7 @@ const RULES=`너는 안경원 카운터에서 쓰는 "렌즈 마크/소비자가
 규칙:
 1) "~종류는?" 질문은 list_options, 가격·마크·사양은 search_lenses 도구로 앱 자료를 조회해서 답한다. 자료에 없는 가격을 지어내지 않는다.
 2) 가격을 말할 때 소비자가와 50% 할인가, 출처연도를 함께 적는다(예: 65만원 / 할인가 32만5천원 · 출처 2026). 출처연도가 2012·2018·연도미상이면 "오래된 자료"라고 알린다.
+3-1) 브랜드가 어느 회사인지 물으면 먼저 브랜드 소유사를 밝힌다: 트랜지션스(Transitions·Gen S·XTRActive·클래식)는 미국 트랜지션스 옵티컬(에실로룩소티카 계열)의 변색 브랜드로 여러 제조사가 라이선스 적용, 센서티·솔리오·메이리오·울트라브이는 호야, 크리잘·바리락스·아이젠·스텔리스트·엑스페리오는 에실로, SEE+UV·SEEBLUE는 니콘, 트랜스폼3·울트라PZ는 니덱 가격표 옵션. 그다음 search_lenses로 그 옵션을 제공하는 회사와 가격대를 알려준다.
 3) 앱 자료에 없는 내용(렌즈 원리, 추천 기준, 다른 회사 일반 정보 등)은 일반 지식으로 답하되 문장 앞에 "[일반 정보]"를 붙이고, 최신 가격·사양은 제조사 확인이 필요하다고 말한다. 인터넷 실시간 검색은 할 수 없다.
 4) 추천을 요청하면 도수·나이·용도·예산을 확인하는 질문을 한두 개 하고, 조회한 제품 2~4개를 비교해 제시한다.
 5) 회사를 지정하지 않은 추천 요청이면 회사별로 조건에 맞는 대표 제품을 1개씩 골라 비교한 뒤 가장 적합한 순으로 순위를 매긴다(예산이 있으면 예산 안 최상위, 없으면 가격·성능 균형). 다른 회사와 가격 비교를 요청하면 같은 굴절률·초점 조건으로 회사별로 search_lenses를 조회해 회사별 최저/대표 가격을 비교하고, 비슷한 가격대의 더 좋은 조건(상위 설계·최신 자료)이나 더 저렴한 대안을 근거와 함께 추천한다.
